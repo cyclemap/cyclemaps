@@ -1,0 +1,25 @@
+{
+	"name": "cyclemap",
+	"type": "module",
+	"scripts": {
+		"build": "tsc && rollup --config --environment BUILD:dev",
+		"build-production": "tsc && rollup --config --environment BUILD:production"
+	},
+	"dependencies": {
+		"@types/geojson": "^7946.0.10",
+		"@types/js-cookie": "^3.0.3",
+		"js-cookie": "^3.0.5",
+		"maplibre-gl": "^3.0.1",
+		"maplibre-gl-vector-text-protocol": "github:jimmyrocks/maplibre-gl-vector-text-protocol#d71ae363b1d6ee2c0bd9bf58fde8008707dd8df3"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^25.0.0",
+		"@rollup/plugin-node-resolve": "^15.1.0",
+		"@rollup/plugin-strip": "^3.0.2",
+		"@rollup/plugin-terser": "^0.4.3",
+		"rollup": "^3.24.0",
+		"rollup-plugin-import-css": "^3.2.1",
+		"tslib": "^2.5.3",
+		"typescript": "^5.1.3"
+	}
+}
