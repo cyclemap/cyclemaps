@@ -55,8 +55,7 @@ export function setupLayers() {
 		});
 	}
 
-	document.getElementById('clearLayers')!.onclick = (event: Event) => {
-	};
+	document.getElementById('clearLayers')!.onclick = clearLayers;
 }
 
 function clearLayers() {
