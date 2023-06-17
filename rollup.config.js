@@ -9,12 +9,9 @@ const {BUILD} = process.env;
 const production = BUILD === 'production';
 
 
-// Common set of plugins/transformations shared across different rollup
-// builds (main maplibre bundle, style-spec package, benchmarks bundle)
-
 const nodeResolve = resolve({
-    browser: true,
-    preferBuiltins: false
+	browser: true,
+	preferBuiltins: false
 });
 
 export default {
@@ -22,9 +19,9 @@ export default {
 	output: {
 		name: 'cyclemap',
 		file: 'dist/cyclemap.js',
-        format: 'esm',
-        indent: false,
-        banner: '/* MIT License Copyright (c) 2023 Contributors */',
+		format: 'esm',
+		indent: false,
+		banner: '/* MIT License Copyright (c) 2023 Contributors */',
 	},
 	plugins: production ?
 		[nodeResolve, css(), strip(), terser(), commonjs()] :
