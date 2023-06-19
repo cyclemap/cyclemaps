@@ -1,5 +1,5 @@
 {
-	"name": "cyclemap",
+	"name": "cyclemaps",
 	"type": "module",
 	"scripts": {
 		"build": "tsc && rollup --config --environment BUILD:dev",

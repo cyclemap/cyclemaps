@@ -17,8 +17,8 @@ const nodeResolve = resolve({
 export default {
 	input: ['build/main.js'],
 	output: {
-		name: 'cyclemap',
-		file: 'dist/cyclemap.js',
+		name: 'cyclemaps',
+		file: 'dist/cyclemaps.js',
 		format: 'esm',
 		indent: false,
 		banner: '/* MIT License Copyright (c) 2023 Contributors */',

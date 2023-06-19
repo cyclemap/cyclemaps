@@ -3,11 +3,11 @@
 set -e #exit on failure
 
 
-base='https://tileserver.cyclemap.us/styles/maptiler-cyclemap'
+base='https://tileserver.cyclemaps.org/styles/maptiler-cyclemaps'
 
 curl --output style.json "$base/style.json"
 
-sed --in-place --expression="s#$base#https://cyclemap.us/sprite#g" style.json
+sed --in-place --expression="s#$base#https://cyclemaps.org/sprite#g" style.json
 cp style.json style-normal.json
 sed --expression='s/hsl(25, 60%, 45%)/red/2' style.json >style-red.json
 sed \

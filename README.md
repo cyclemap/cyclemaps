@@ -1,7 +1,7 @@
 
 ## domain name
 
-* [cyclemap.us](https://cyclemap.us/)
+* [cyclemaps.org](https://cyclemaps.org/)
 
 ## notes
 
