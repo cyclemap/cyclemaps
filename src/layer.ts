@@ -24,6 +24,7 @@ export interface CyclemapLayerSpecification {
 	source: SourceSpecification;
 	beforeId?: string;
 	onAddLayer?: (layer: CyclemapLayerSpecification) => void;
+	onRemoveLayer?: (layer: CyclemapLayerSpecification) => void;
 	active?: boolean;
 	layout?: any;
 	paint?: any;
@@ -208,6 +209,9 @@ export function removeLayer(layer: CyclemapLayerSpecification) {
 	let id = layer.id;
 	if(main.map.getLayer(id) == null) {
 		return;
+	}
+	if(layer.onRemoveLayer !== undefined) {
+		layer.onRemoveLayer(layer);
 	}
 	main.map.removeLayer(id);
 }

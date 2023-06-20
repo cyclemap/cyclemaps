@@ -51,11 +51,17 @@
 		.legend {
 			position: absolute;
 			display: inline-block;
-			left: 110px;
-			bottom: 2px;
 
 			font-size: small;
 			z-index: 2;
+		}
+		.bottomLegend {
+			left: 110px;
+			bottom: 2px;
+		}
+		.rightLegend {
+			right: 10px;
+			bottom: 20px;
 		}
 		.pathLegend {
 			display: inline-block;
@@ -96,6 +102,23 @@
 			background-color: #48b;
 			color: #fff;
 		}
+		.rainLegend {
+			visibility: hidden;
+		}
+		.guage {
+			display: inline-block;
+		}
+		.guageNumbers {
+			position: absolute;
+			bottom: 0px;
+			width: 23px;
+			height: 420px;
+			margin-bottom: 30px;
+		}
+		.guageUnit {
+			text-align: center;
+			width: 23px;
+		}
 	</style>
 </head>
 <body>
@@ -110,7 +133,14 @@
 	</nav>
 	<div id="map" class="map">
 	</div>
-	<div class="legend">
+	<div class="rightLegend legend">
+		<div id="rainLegend" class="rainLegend">
+			<div class="guage"><img src="sprite/noaa-guage.png" /></div>
+			<div class="guage"><img src="sprite/guage-cm.svg" class="guageNumbers" /><div class="guageUnit">cm</div></div>
+			<div class="guage"><img src="sprite/guage-in.svg" class="guageNumbers" /><div class="guageUnit">in</div></div>
+		</div>
+	</div>
+	<div class="bottomLegend legend">
 		<div class="pathLegend">
 			<div class="legendItem"><div style="color: hsl(120, 60%, 30%);" class="pathLegendColor">█</div> paved</div>
 			<div class="legendItem"><div style="color: hsl(25, 60%, 45%);" class="pathLegendColor">█</div> unpaved?</div>
@@ -157,6 +187,7 @@
 			<li><a href="https://github.com/pnorman/osmborder">osmborder</a></li>
 			<li><a href="https://omniscale.com/">omniscale</a></li>
 		<li><a href="https://github.com/maplibre/maplibre-gl-js">maplibre</a></li>
+		<li><a href="https://water.weather.gov/precip/about.php">national weather service advanced hydrologic prediction service</a></li>
 		<li><a href="https://maputnik.github.io/">maputnik</a></li>
 		<li><a href="https://www.docker.com/">docker</a> / <a href="https://ubuntu.com/">ubuntu</a> / <a href="https://www.gnu.org/">gnu</a> / <a href="https://www.kernel.org/">linux</a></li>
 		</ul>

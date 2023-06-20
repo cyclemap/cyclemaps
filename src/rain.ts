@@ -42,6 +42,8 @@ function addRainButton(key: string) {
 		"layout": {"visibility": "visible"},
 		"paint": {"raster-opacity": 0.5},
 		"beforeId": "rain-anchor",
+		"onAddLayer": addRainLegend,
+		"onRemoveLayer": removeRainLegend,
 		"source": {
 			"type": "raster",
 			"tileSize": TILE_SIZE,
@@ -50,5 +52,13 @@ function addRainButton(key: string) {
 			],
 		},
 	});
+}
+
+function addRainLegend(layer: layer.CyclemapLayerSpecification) {
+	document.getElementById('rainLegend')!.style.visibility = 'visible';
+}
+
+function removeRainLegend(layer: layer.CyclemapLayerSpecification) {
+	document.getElementById('rainLegend')!.style.visibility = 'hidden';
 }
 
