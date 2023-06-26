@@ -1,99 +1,114 @@
 
-import * as main from './main.js';
 import * as util from './util.js';
-import * as layer from './layer.js';
+import { LayerControl, CyclemapLayerSpecification } from './layer.js';
 
-import { LngLat, MapTouchEvent, MapMouseEvent } from 'maplibre-gl';
+import { IControl, LngLat, Map, MapTouchEvent, MapMouseEvent } from 'maplibre-gl';
 import { Feature, FeatureCollection } from 'geojson';
 
 const openrouteAccessToken: string = '5b3ce3597851110001cf6248ba1b7964630a48d9841d1336bd6686c7';
 
 let startPoint: LngLat | null = null;
 
-export function setupRoute() {
-	addRouteListener();
-}
+export class RouteControl implements IControl {
+	map: Map | undefined;
+	layerControl: LayerControl;
+	dummyContainer: HTMLElement | undefined;
 
+	constructor(layerControl: LayerControl) {
+		this.layerControl = layerControl;
+	}
 
-/**
- * long press implementation here is fairly manual
- */
-function addRouteListener() {
-	main.map.on('contextmenu', fireRoute); //right click
+	onAdd(map: Map) {
+		this.map = map;
+		this.dummyContainer = document.createElement('div');
+		this.addRouteListener();
+		return this.dummyContainer;
+	}
 	
-	let routeTimeout: any = null;
-	let clearRouteTimeout = () => clearTimeout(routeTimeout);
+	onRemove(map: Map) {
+		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
+		this.map = undefined;
+	}
+	
+	/**
+	 * long press implementation here is fairly manual
+	 */
+	addRouteListener() {
+		this.map!.on('contextmenu', event => this.fireRoute(event)); //right click
+		
+		let routeTimeout: any = null;
+		let clearRouteTimeout = () => clearTimeout(routeTimeout);
 
-	main.map.on('touchstart', (event: MapTouchEvent) => {
-		if(event.originalEvent.touches.length > 1) {
+		this.map!.on('touchstart', (event: MapTouchEvent) => {
+			if(event.originalEvent.touches.length > 1) {
+				return;
+			}
+			routeTimeout = setTimeout(() => {
+				window.navigator.vibrate(100);
+				setTimeout(() => this.fireRoute(event), 1);
+			}, 500);
+		});
+		this.map!.on('touchend', clearRouteTimeout);
+		this.map!.on('touchcancel', clearRouteTimeout);
+		this.map!.on('touchmove', clearRouteTimeout);
+		this.map!.on('pointerdrag', clearRouteTimeout);
+		this.map!.on('pointermove', clearRouteTimeout);
+		this.map!.on('moveend', clearRouteTimeout);
+		this.map!.on('gesturestart', clearRouteTimeout);
+		this.map!.on('gesturechange', clearRouteTimeout);
+		this.map!.on('gestureend', clearRouteTimeout);
+	}
+
+	fireRoute(event: MapTouchEvent | MapMouseEvent) {
+		if(openrouteAccessToken === null) {
 			return;
 		}
-		routeTimeout = setTimeout(() => {
-			window.navigator.vibrate(100);
-			setTimeout(() => fireRoute(event), 1);
-		}, 500);
-	});
-	main.map.on('touchend', clearRouteTimeout);
-	main.map.on('touchcancel', clearRouteTimeout);
-	main.map.on('touchmove', clearRouteTimeout);
-	main.map.on('pointerdrag', clearRouteTimeout);
-	main.map.on('pointermove', clearRouteTimeout);
-	main.map.on('moveend', clearRouteTimeout);
-	main.map.on('gesturestart', clearRouteTimeout);
-	main.map.on('gesturechange', clearRouteTimeout);
-	main.map.on('gestureend', clearRouteTimeout);
-}
-
-function fireRoute(event: MapTouchEvent | MapMouseEvent) {
-	if(openrouteAccessToken === null) {
-		return;
-	}
-	
-	let point = event.lngLat;
-	addRoutePoint(point);
-}
-
-function addRoutePoint(point: LngLat) {
-	if(startPoint === null) {
-		removeRouteButton('startPoint');
-		removeRouteButton('endPoint');
-		removeRouteButton('route');
 		
-		startPoint = point;
-		let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: 'start'} };
-		layer.addLayerHelper('startPoint', 'symbol', pointFeature);
-		return;
+		let point = event.lngLat;
+		this.addRoutePoint(point);
 	}
 
-	let endPoint = point;
+	addRoutePoint(point: LngLat) {
+		if(startPoint === null) {
+			this.removeRouteButton('startPoint');
+			this.removeRouteButton('endPoint');
+			this.removeRouteButton('route');
+			
+			startPoint = point;
+			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: 'start'} };
+			this.layerControl.addLayerHelper('startPoint', 'symbol', pointFeature);
+			return;
+		}
 
-	let query = new URLSearchParams();
-	query.set('api_key', openrouteAccessToken);
-	query.set('start', util.reversedPointToString(startPoint, 6));
-	query.set('end', util.reversedPointToString(endPoint, 6));
+		let endPoint = point;
 
-	let url = `https://api.openrouteservice.org/v2/directions/cycling-regular?${query}`;
+		let query = new URLSearchParams();
+		query.set('api_key', openrouteAccessToken);
+		query.set('start', util.reversedPointToString(startPoint, 6));
+		query.set('end', util.reversedPointToString(endPoint, 6));
 
-	util.ajaxGet(url, (data: FeatureCollection) => {
-		//sending in url directly here doesn't work because of somesuch header (Accept: application/json) made the server mad
-		layer.addLayerHelper('route', 'line', data);
-		let summary = data.features[0]?.properties?.summary;
-		let duration = (summary.duration / 3600).toFixed(1);
-		let distance = (summary.distance / 1000).toFixed(0);
-		let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: `end ${duration}h\n${distance}km`} };
-		layer.addLayerHelper('endPoint', 'symbol', pointFeature);
-	});
-	
-	startPoint = null;
-}
+		let url = `https://api.openrouteservice.org/v2/directions/cycling-regular?${query}`;
 
-function removeRouteButton(id: string) {
-	let routeButton: HTMLElement | null = document.getElementById(id);
-	const routeLayer: layer.CyclemapLayerSpecification = layer.layerMap[id];
-	if(routeButton === null || routeLayer === undefined) {
-		return;
+		util.ajaxGet(url, (data: FeatureCollection) => {
+			//sending in url directly here doesn't work because of somesuch header (Accept: application/json) made the server mad
+			this.layerControl.addLayerHelper('route', 'line', data);
+			let summary = data.features[0]?.properties?.summary;
+			let duration = (summary.duration / 3600).toFixed(1);
+			let distance = (summary.distance / 1000).toFixed(0);
+			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: `end ${duration}h\n${distance}km`} };
+			this.layerControl.addLayerHelper('endPoint', 'symbol', pointFeature);
+		});
+		
+		startPoint = null;
 	}
-	layer.removeLayerButton(routeLayer);
-	routeButton.classList.remove('active');
-}
 
+	removeRouteButton(id: string) {
+		let routeButton: HTMLElement | null = document.getElementById(id);
+		const routeLayer: CyclemapLayerSpecification = this.layerControl.layerMap[id];
+		if(routeButton === null || routeLayer === undefined) {
+			return;
+		}
+		this.layerControl.removeLayerButton(routeLayer);
+		routeButton.classList.remove('active');
+	}
+}

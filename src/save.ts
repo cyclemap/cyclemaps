@@ -1,44 +1,63 @@
 
-import * as main from './main.js';
+import { LayerControl } from './layer.js';
 import * as util from './util.js';
 
-import { MapMouseEvent } from 'maplibre-gl';
+import { MapMouseEvent, IControl, Map } from 'maplibre-gl';
 
-export function setupSavePoint() {
-	addSavePointListener();
-}
+export class SaveControl implements IControl {
+	layerControl: LayerControl;
+	map: Map | undefined;
+	dummyContainer: HTMLElement | undefined;
 
-function addSavePointListener() {
-	main.map.on('click', (event: MapMouseEvent) => {
-		if(event.originalEvent.ctrlKey || event.originalEvent.metaKey) {
-			fireSavePoint(event);
-		}
-	});
-}
-
-function fireSavePoint(event: MapMouseEvent) {
-	if(main.savePoint.url == null) {
-		return;
+	constructor(layerControl: LayerControl) {
+		this.layerControl = layerControl;
 	}
 
-	let category = prompt('please enter a category', 'edited');
-	if(category == null) {
-		return;
-	}
-
-	let title = prompt('please enter a title', '');
-	if(title == null) {
-		return;
+	onAdd(map: Map) {
+		this.map = map;
+		this.dummyContainer = document.createElement('div');
+		this.addSavePointListener();
+		return this.dummyContainer;
 	}
 	
-	let query = new URLSearchParams();
-	query.set('point', util.pointToString(event.lngLat, 4));
-	query.set('category', category);
-	query.set('title', title);
-	let url = `${main.savePoint.url}?${query}`;
+	onRemove(map: Map) {
+		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
+		this.map = undefined;
+	}
+	
+	addSavePointListener() {
+		this.map!.on('click', (event: MapMouseEvent) => {
+			if(event.originalEvent.ctrlKey || event.originalEvent.metaKey) {
+				this.fireSavePoint(event);
+			}
+		});
+	}
 
-	util.ajaxGet(url, (data?: {msg?: string}) => {
-		alert(data?.msg ?? 'failure');
-	});
+	fireSavePoint(event: MapMouseEvent) {
+		if(this.layerControl.savePointUrl === undefined) {
+			return;
+		}
+
+		let category = prompt('please enter a category', 'edited');
+		if(category == null) {
+			return;
+		}
+
+		let title = prompt('please enter a title', '');
+		if(title == null) {
+			return;
+		}
+		
+		let query = new URLSearchParams();
+		query.set('point', util.pointToString(event.lngLat, 4));
+		query.set('category', category);
+		query.set('title', title);
+		let url = `${this.layerControl.savePointUrl}?${query}`;
+
+		util.ajaxGet(url, (data?: {msg?: string}) => {
+			alert(data?.msg ?? 'failure');
+		});
+	}
+
 }
 

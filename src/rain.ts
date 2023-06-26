@@ -1,6 +1,7 @@
 
-import * as main from './main.js';
-import * as layer from './layer.js';
+import { LayerControl, CyclemapLayerSpecification } from './layer.js';
+
+import { IControl, Map } from 'maplibre-gl';
 
 const TILE_SIZE = 2048;
 
@@ -16,49 +17,67 @@ const RAIN_PATH = 'https://mapservices.weather.noaa.gov/raster/rest/services/obs
 
 //5 day and 7 day can be found here:  https://www.wpc.ncep.noaa.gov/qpf/p120i.gif  https://www.wpc.ncep.noaa.gov/qpf/p168i.gif
 
-export function setupRain() {
-	main.map.on('style.load', (event: Event) => {
-		addRainButtons();
-	});
-	main.map.on('load', (event: Event) => {
-		addRainButtons();
-	});
-}
+export class RainControl implements IControl {
+	map: Map | undefined;
+	layerControl: LayerControl;
+	dummyContainer: HTMLElement | undefined;
 
-function addRainButtons() {
-	for(let key in LAYER_ID_MAP) {
-		addRainButton(key);
+	constructor(layerControl: LayerControl) {
+		this.layerControl = layerControl;
 	}
-}
 
-function addRainButton(key: string) {
-	let layerId: number = LAYER_ID_MAP[key];
+	onAdd(map: Map) {
+		this.map = map;
+		this.dummyContainer = document.createElement('div');
+		map.on('style.load', (event: Event) => {
+			this.addRainButtons();
+		});
+		map.on('load', (event: Event) => {
+			this.addRainButtons();
+		});
+		return this.dummyContainer;
+	}
+	
+	onRemove(map: Map) {
+		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
+		this.map = undefined;
+	}
+	
+	addRainButtons() {
+		for(let key in LAYER_ID_MAP) {
+			this.addRainButton(key);
+		}
+	}
 
-	layer.addLayerButton({
-		"id": `rain-history-${key}`,
-		"name": `rain ${key}`,
-		"active": false,
-		"type": "raster",
-		"layout": {"visibility": "visible"},
-		"paint": {"raster-opacity": 0.5},
-		"beforeId": "rain-anchor",
-		"onAddLayer": addRainLegend,
-		"onRemoveLayer": removeRainLegend,
-		"source": {
+	addRainButton(key: string) {
+		let layerId: number = LAYER_ID_MAP[key];
+
+		this.layerControl.addLayerButton({
+			"id": `rain-history-${key}`,
+			"name": `rain ${key}`,
+			"active": false,
 			"type": "raster",
-			"tileSize": TILE_SIZE,
-			"tiles" : [
-				`${RAIN_PATH}?bbox={bbox-epsg-3857}&size=${TILE_SIZE/4},${TILE_SIZE/4}&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:${layerId}&f=image`
-			],
-		},
-	});
-}
+			"layout": {"visibility": "visible"},
+			"paint": {"raster-opacity": 0.5},
+			"beforeId": "rain-anchor",
+			"onAddLayer": this.addRainLegend,
+			"onRemoveLayer": this.removeRainLegend,
+			"source": {
+				"type": "raster",
+				"tileSize": TILE_SIZE,
+				"tiles" : [
+					`${RAIN_PATH}?bbox={bbox-epsg-3857}&size=${TILE_SIZE/4},${TILE_SIZE/4}&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:${layerId}&f=image`
+				],
+			},
+		});
+	}
 
-function addRainLegend(layer: layer.CyclemapLayerSpecification) {
-	document.getElementById('rainLegend')!.style.visibility = 'visible';
-}
+	addRainLegend(layer: CyclemapLayerSpecification) {
+		document.getElementById('rainLegend')!.style.visibility = 'visible';
+	}
 
-function removeRainLegend(layer: layer.CyclemapLayerSpecification) {
-	document.getElementById('rainLegend')!.style.visibility = 'hidden';
+	removeRainLegend(layer: CyclemapLayerSpecification) {
+		document.getElementById('rainLegend')!.style.visibility = 'hidden';
+	}
 }
 

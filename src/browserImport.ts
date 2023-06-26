@@ -1,10 +1,10 @@
 
 //this seems terrible, someone fix javascript
 
-import * as main from './main.js';
+import { mainControl } from './main.js';
 
 export function setupImports() {
-	(window as any).main = main;
+	(window as any).mainControl = mainControl;
 }
 
 
