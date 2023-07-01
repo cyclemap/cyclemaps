@@ -104,20 +104,10 @@
 		}
 		.rainLegend {
 			visibility: hidden;
+			padding: 5px;
 		}
 		.guage {
 			display: inline-block;
-		}
-		.guageNumbers {
-			position: absolute;
-			bottom: 0px;
-			width: 23px;
-			height: 420px;
-			margin-bottom: 30px;
-		}
-		.guageUnit {
-			text-align: center;
-			width: 23px;
 		}
 	</style>
 </head>
@@ -135,9 +125,7 @@
 	</div>
 	<div class="rightLegend legend">
 		<div id="rainLegend" class="rainLegend">
-			<div class="guage"><img src="sprite/noaa-guage.png" /></div>
-			<div class="guage"><img src="sprite/guage-cm.svg" class="guageNumbers" /><div class="guageUnit">cm</div></div>
-			<div class="guage"><img src="sprite/guage-in.svg" class="guageNumbers" /><div class="guageUnit">in</div></div>
+			<img src="sprite/guage.svg" height="450px" />
 		</div>
 	</div>
 	<div class="bottomLegend legend">

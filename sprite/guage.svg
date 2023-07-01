@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<svg
+	version="1.1"
+	width="95"
+	height="550"
+	viewBox="0 0 95 550"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:svg="http://www.w3.org/2000/svg">
+	<defs>
+		<g id="box">
+			<rect
+				x="7" y="7"
+				width="21"
+				height="35"
+				/>
+			<rect
+				width="10"
+				height="35"
+				transform="matrix(0.70710678,0.70710678,0,1,0,0)" />
+		</g>
+	</defs>
+	<g transform="translate(10, 10)" style="font-size:15px;font-family:sans-serif">
+		<g transform="translate(0,490)">
+			<text y="12"><tspan x="32">cm</tspan><tspan x="60">in</tspan></text>
+		</g>
+		<g transform="translate(0,455)">
+			<use href="#box" style="fill:#1cf" />
+			<text y="12"><tspan x="32">.3</tspan><tspan x="60">.1</tspan></text>
+		</g>
+		<g transform="translate(0,420)">
+			<use href="#box" style="fill:#38c" />
+			<text y="12"><tspan x="32">.6</tspan><tspan x="60">.25</tspan></text>
+		</g>
+		<g transform="translate(0,385)">
+			<use href="#box" style="fill:#019" />
+			<text y="12"><tspan x="32">1</tspan><tspan x="60">.5</tspan></text>
+		</g>
+		<g transform="translate(0,350)">
+			<use href="#box" style="fill:#0f1" />
+			<text y="12"><tspan x="32">2</tspan><tspan x="60">.75</tspan></text>
+		</g>
+		<g transform="translate(0,315)">
+			<use href="#box" style="fill:#0a0" />
+			<text y="12"><tspan x="32">3</tspan><tspan x="60">1</tspan></text>
+		</g>
+		<g transform="translate(0,280)">
+			<use href="#box" style="fill:#060" />
+			<text y="12"><tspan x="32">4</tspan><tspan x="60">1.5</tspan></text>
+		</g>
+		<g transform="translate(0,245)">
+			<use href="#box" style="fill:#ff0" />
+			<text y="12"><tspan x="32">5</tspan><tspan x="60">2</tspan></text>
+		</g>
+		<g transform="translate(0,210)">
+			<use href="#box" style="fill:#fd6" />
+			<text y="12"><tspan x="32">6</tspan><tspan x="60">2.5</tspan></text>
+		</g>
+		<g transform="translate(0,175)">
+			<use href="#box" style="fill:#f90" />
+			<text y="12"><tspan x="32">8</tspan><tspan x="60">3</tspan></text>
+		</g>
+		<g transform="translate(0,140)">
+			<use href="#box" style="fill:#f00" />
+			<text y="12"><tspan x="32">10</tspan><tspan x="60">4</tspan></text>
+		</g>
+		<g transform="translate(0,105)">
+			<use href="#box" style="fill:#a00" />
+			<text y="12"><tspan x="32">13</tspan><tspan x="60">5</tspan></text>
+		</g>
+		<g transform="translate(0,70)">
+			<use href="#box" style="fill:#700" />
+			<text y="12"><tspan x="32">15</tspan><tspan x="60">6</tspan></text>
+		</g>
+		<g transform="translate(0,35)">
+			<use href="#box" style="fill:#f0f" />
+			<text y="12"><tspan x="32">20</tspan><tspan x="60">8</tspan></text>
+		</g>
+		<g transform="translate(0,0)">
+			<use href="#box" style="fill:#74e" />
+			<text y="12"><tspan x="32">25</tspan><tspan x="60">10</tspan></text>
+		</g>
+
+		<rect
+			style="fill:#74e"
+			width="10"
+			height="21"
+			transform="matrix(0.70710678,0.70710678,1,0,0,0)" />
+
+		<!-- shading -->
+		<rect
+			style="fill:white;fill-opacity:0.4"
+			width="10"
+			height="21"
+			transform="matrix(0.70710678,0.70710678,1,0,0,0)" />
+		<rect
+			style="fill:black;fill-opacity:0.2"
+			width="10"
+			height="490"
+			transform="matrix(0.70710678,0.70710678,0,1,0,0)" />
+	</g>
+</svg>
