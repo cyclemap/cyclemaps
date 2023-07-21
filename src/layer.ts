@@ -2,7 +2,7 @@
 import { MainControl } from './main.js';
 import * as util from './util.js';
 
-import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature, MapEvent } from 'maplibre-gl';
+import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 
 const mapboxAccessToken = 'pk.eyJ1IjoiY3ljbGVtYXB1cyIsImEiOiJjanNhbHRlaGMwMGp2NDNqeG80Mzk2cmExIn0.0OBPtvf3KANeaA6QOCk1yw';
@@ -94,7 +94,7 @@ export class LayerControl implements IControl {
 			});
 		}
 
-		document.getElementById('clearLayers')!.onclick = this.clearLayers;
+		document.getElementById('clearLayers')!.onclick = (event: Event) => this.clearLayers();
 	}
 
 	addLayerButtons(layers: CyclemapLayerSpecification[]) {
@@ -123,7 +123,6 @@ export class LayerControl implements IControl {
 			const layer = this.layerMap[input.id];
 			if(layer !== undefined) {
 				this.removeLayer(layer);
-				input.classList.remove('active');
 			}
 		});
 	}
@@ -154,12 +153,13 @@ export class LayerControl implements IControl {
 			return;
 		}
 		
+		layerPicker.appendChild(button);
+		
 		this.layerMap[layer.id] = layer;
 
 		button.setAttribute('id', id);
 		button.setAttribute('class', 'maplibregl-ctrl maplibregl-ctrl-group');
 		if(layer.active !== undefined && layer.active === true) {
-			classList.add('active');
 			this.addLayer(layer);
 		}
 		let name = layer.name !== undefined ? layer.name : id.substr(0, 4);
@@ -167,15 +167,12 @@ export class LayerControl implements IControl {
 		button.onclick = (event: Event) => {
 			let active = !classList.contains('active');
 			if(active) {
-				classList.add('active');
 				this.addLayer(layer);
 			}
 			else {
-				classList.remove('active');
 				this.removeLayer(layer);
 			}
 		};
-		layerPicker.appendChild(button);
 		
 		document.getElementById('clearLayers')!.style.visibility = 'visible';
 	}
@@ -225,6 +222,11 @@ export class LayerControl implements IControl {
 				}
 			});
 		}
+		
+		let button: HTMLElement | null = document.getElementById(id);
+		if(button != null) {
+			button.classList.add('active');
+		}
 	}
 
 	removeLayerButton(layer: CyclemapLayerSpecification) {
@@ -252,6 +254,10 @@ export class LayerControl implements IControl {
 			layer.onRemoveLayer(layer);
 		}
 		this.map!.removeLayer(id);
+		let button: HTMLElement | null = document.getElementById(id);
+		if(button != null) {
+			button.classList.remove('active');
+		}
 	}
 
 	getOptions(type: string) {
@@ -332,5 +338,19 @@ export class LayerControl implements IControl {
 			return;
 		}
 		console.error('unknown type: ', type);
+	}
+
+	removeLayerButtonById(id: string) {
+		const layer: CyclemapLayerSpecification = this.layerMap[id];
+		if(layer !== undefined) {
+			this.removeLayerButton(layer);
+		}
+	}
+
+	removeLayerById(id: string) {
+		const layer: CyclemapLayerSpecification = this.layerMap[id];
+		if(layer !== undefined) {
+			this.removeLayer(layer);
+		}
 	}
 }

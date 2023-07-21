@@ -49,19 +49,29 @@ export class RainControl implements IControl {
 		}
 	}
 
+	removeRainLayers() {
+		for(let key in LAYER_ID_MAP) {
+			this.layerControl.removeLayerById(this.getRainId(key));
+		}
+	}
+
+	getRainId(key: string) {
+		return `rain-history-${key}`;
+	}
+
 	addRainButton(key: string) {
 		let layerId: number = LAYER_ID_MAP[key];
 
 		this.layerControl.addLayerButton({
-			"id": `rain-history-${key}`,
+			"id": this.getRainId(key),
 			"name": `rain ${key}`,
 			"active": false,
 			"type": "raster",
 			"layout": {"visibility": "visible"},
 			"paint": {"raster-opacity": 0.5},
 			"beforeId": "rain-anchor",
-			"onAddLayer": this.addRainLegend,
-			"onRemoveLayer": this.removeRainLegend,
+			"onAddLayer": (layer: CyclemapLayerSpecification) => this.onAddLayer(layer),
+			"onRemoveLayer": (layer: CyclemapLayerSpecification) => this.onRemoveLayer(layer),
 			"source": {
 				"type": "raster",
 				"tileSize": TILE_SIZE,
@@ -72,11 +82,12 @@ export class RainControl implements IControl {
 		});
 	}
 
-	addRainLegend(layer: CyclemapLayerSpecification) {
+	onAddLayer(layer: CyclemapLayerSpecification) {
+		this.removeRainLayers();
 		document.getElementById('rainLegend')!.style.visibility = 'visible';
 	}
 
-	removeRainLegend(layer: CyclemapLayerSpecification) {
+	onRemoveLayer(layer: CyclemapLayerSpecification) {
 		document.getElementById('rainLegend')!.style.visibility = 'hidden';
 	}
 }

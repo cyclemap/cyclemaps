@@ -70,9 +70,9 @@ export class RouteControl implements IControl {
 
 	addRoutePoint(point: LngLat) {
 		if(startPoint === null) {
-			this.removeRouteButton('startPoint');
-			this.removeRouteButton('endPoint');
-			this.removeRouteButton('route');
+			this.layerControl.removeLayerButtonById('startPoint');
+			this.layerControl.removeLayerButtonById('endPoint');
+			this.layerControl.removeLayerButtonById('route');
 			
 			startPoint = point;
 			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: 'start'} };
@@ -100,15 +100,5 @@ export class RouteControl implements IControl {
 		});
 		
 		startPoint = null;
-	}
-
-	removeRouteButton(id: string) {
-		let routeButton: HTMLElement | null = document.getElementById(id);
-		const routeLayer: CyclemapLayerSpecification = this.layerControl.layerMap[id];
-		if(routeButton === null || routeLayer === undefined) {
-			return;
-		}
-		this.layerControl.removeLayerButton(routeLayer);
-		routeButton.classList.remove('active');
 	}
 }

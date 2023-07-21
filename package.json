@@ -9,7 +9,7 @@
 		"@types/geojson": "^7946.0.10",
 		"@types/js-cookie": "^3.0.3",
 		"js-cookie": "^3.0.5",
-		"maplibre-gl": "^3.0.1",
+		"maplibre-gl": "^3.2.0",
 		"maplibre-gl-vector-text-protocol": "github:jimmyrocks/maplibre-gl-vector-text-protocol#d71ae363b1d6ee2c0bd9bf58fde8008707dd8df3"
 	},
 	"devDependencies": {
