@@ -52,6 +52,7 @@ export class MainControl implements IControl {
 		this.map.addControl(new RainControl(layerControl));
 		this.map.addControl(new RouteControl(layerControl));
 		this.map.scrollZoom.setWheelZoomRate(4 / 450); //default is 1 / 450
+		this.map.on('load', (event: Event) => this.map.resize()); // https://github.com/mapbox/mapbox-gl-js/issues/8982
 	}
 
 	onAdd(map: Map) {
@@ -66,10 +67,10 @@ export class MainControl implements IControl {
 	}
 	
 	addMoveListener() {
-		this.map.on('moveend', () => this.checkMove);
+		this.map.on('moveend', () => this.checkMove());
 		this.checkMove();
 		
-		this.map.on('zoom', () => this.checkZoom);
+		this.map.on('zoom', () => this.checkZoom());
 		this.checkZoom();
 	}
 	
