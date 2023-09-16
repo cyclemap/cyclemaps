@@ -6,6 +6,7 @@ import { IControl, LngLat, Map, MapTouchEvent, MapMouseEvent } from 'maplibre-gl
 import { Feature, FeatureCollection } from 'geojson';
 
 const openrouteAccessToken: string = '5b3ce3597851110001cf6248ba1b7964630a48d9841d1336bd6686c7';
+const DURATION_RATIO = 0.92; //discount the duration, because i feel like it
 
 let startPoint: LngLat | null = null;
 
@@ -93,7 +94,7 @@ export class RouteControl implements IControl {
 			//sending in url directly here doesn't work because of somesuch header (Accept: application/json) made the server mad
 			this.layerControl.addLayerHelper('route', 'line', data);
 			let summary = data.features[0]?.properties?.summary;
-			let duration = (summary.duration / 3600).toFixed(1);
+			let duration = (summary.duration / 3600 * DURATION_RATIO).toFixed(1);
 			let distance = (summary.distance / 1000).toFixed(0);
 			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: `end ${duration}h\n${distance}km`} };
 			this.layerControl.addLayerHelper('endPoint', 'symbol', pointFeature);
