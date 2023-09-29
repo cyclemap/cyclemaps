@@ -26,11 +26,11 @@
 			user-select: none;
 		}
 		.about {
+			display: none;
 			z-index: 2;
 			width: 100%;
 			height: 100%;
 			position: absolute;
-			visibility: hidden;
 			backdrop-filter: blur(3px);
 		}
 		.border {
@@ -92,18 +92,44 @@
 			vertical-align: middle;
 			transform: scale(.75);
 		}
-		.picker {
-			font-size: 10px;
+		@media (orientation: portrait) {
+			.pickerHolder {
+				flex-direction: column;
+			}
+			.pickerHolder nav {
+				flex-direction: row;
+			}
 		}
-		.picker button {
-			font-size: 10px;
+		@media (orientation: landscape) {
+			.pickerHolder {
+				flex-direction: row;
+			}
+			.pickerHolder nav {
+				flex-direction: column;
+			}
 		}
-		.picker button.active {
+		.pickerHolder {
+			display: inline-flex;
+			padding-top: .5rem;
+			padding-left: .5rem;
+		}
+		.pickerHolder nav {
+			display: inline-flex;
+		}
+		.pickerHolder button {
+			margin: .3rem !important;
+			padding: 0;
+			width: 5.5rem;
+			height: 1.8rem;
+			font-size: .8rem;
+			font-weight: 700;
+		}
+		.pickerHolder button.active {
 			background-color: #48b;
 			color: #fff;
 		}
 		.rainLegend {
-			visibility: hidden;
+			display: none;
 			padding: 5px;
 		}
 		.guage {
@@ -112,14 +138,7 @@
 	</style>
 </head>
 <body>
-	<div class="links maplibregl-ctrl-top-left">
-		<button class="maplibregl-ctrl maplibregl-ctrl-group" onclick="document.getElementById('about').style.visibility = 'visible';">cyclemaps</button>
-		<button class="maplibregl-ctrl maplibregl-ctrl-group" onclick="window.open(`https://www.strava.com/heatmap#${window.mainControl.getHeatmapPoint()}/hot/ride`);">heat</button>
-		<button class="maplibregl-ctrl maplibregl-ctrl-group" onclick="window.open(`https://www.openstreetmap.org/edit#map=${window.mainControl.getOsmPoint()}`);">osm</button>
-		<button class="maplibregl-ctrl maplibregl-ctrl-group" onclick="window.open(`https://www.google.com/maps/@${window.mainControl.getGPoint()}z`);">g</button>
-	</div>
-	<button id="clearLayers" class="maplibregl-ctrl maplibregl-ctrl-group picker" style="visibility: hidden;">clear</button>
-	<nav id="layerPicker" class="picker">
+	<nav id="picker" class="pickerHolder">
 	</nav>
 	<div id="map" class="map">
 	</div>
@@ -143,10 +162,7 @@
 			<div class="legendItem"><div class="icon" style="background-position: -204px -112px;"></div> water</div>
 		</div>
 	</div>
-	<div id="about" class="about"><div class="border">
-		<p><a href="#" onclick="
-			document.getElementById('about').style.visibility = 'hidden';
-		">⇐</a></p>
+	<div id="about" class="about" onClick="document.getElementById('about').style.display = 'none';"><div class="border">
 		<ul>
 		<li>if you notice a problem, please
 		<a class="osm-link" href="#" onclick="
@@ -159,25 +175,25 @@
 		<p>thanks to the many projects that this site depends on.</p>
 
 		<ul>
-		<li><a href="https://www.openstreetmap.org/copyright">openstreetmap contributors</a></li>
-		<li><a href="https://github.com/cyclemap/cyclemaps">github pages</a></li>
-		<li><a href="https://openmaptiles.org/">openmaptiles</a> (<a href="https://github.com/cyclemap/openmaptiles-cycle/">our edits</a>)</li>
-		<li><a href="https://github.com/openmaptiles/maptiler-basic-gl-style">maptiler styles</a> (<a href="https://github.com/cyclemap/openmaptiles-cycle/">our edits</a>)</li>
-		<li><a href="https://github.com/maptiler/tileserver-gl/">maptiler tile server</a></li>
-		<li><a href="https://www.postgresql.org/">postgresql</a> &amp; <a href="https://postgis.net/">postgis</a></li>
-		<li><a href="https://www.wikidata.org/">wikidata</a></li>
-		<li><a href="https://openrouteservice.org/">openrouteservice</a></li>
-			<li><a href="https://openaddresses.io/">openaddresses</a></li>
-			<li><a href="https://www.geonames.org/">geonames</a></li>
-			<li><a href="https://www.whosonfirst.org/">who's on first</a></li>
+		<li><a href="https://www.openstreetmap.org/copyright" target="_blank">openstreetmap contributors</a></li>
+		<li><a href="https://github.com/cyclemap/cyclemaps" target="_blank">github pages</a></li>
+		<li><a href="https://openmaptiles.org/" target="_blank">openmaptiles</a> (<a href="https://github.com/cyclemap/openmaptiles-cycle/" target="_blank">our edits</a>)</li>
+		<li><a href="https://github.com/openmaptiles/maptiler-basic-gl-style" target="_blank">maptiler styles</a> (<a href="https://github.com/cyclemap/openmaptiles-cycle/" target="_blank">our edits</a>)</li>
+		<li><a href="https://github.com/maptiler/tileserver-gl/" target="_blank">maptiler tile server</a></li>
+		<li><a href="https://www.postgresql.org/" target="_blank">postgresql</a> &amp; <a href="https://postgis.net/" target="_blank">postgis</a></li>
+		<li><a href="https://www.wikidata.org/" target="_blank">wikidata</a></li>
+		<li><a href="https://openrouteservice.org/" target="_blank">openrouteservice</a></li>
+			<li><a href="https://openaddresses.io/" target="_blank">openaddresses</a></li>
+			<li><a href="https://www.geonames.org/" target="_blank">geonames</a></li>
+			<li><a href="https://www.whosonfirst.org/" target="_blank">who's on first</a></li>
 		<!-- openmaptiles-tools -->
-			<li><a href="https://www.naturalearthdata.com/">natural earth</a></li>
-			<li><a href="https://github.com/pnorman/osmborder">osmborder</a></li>
-			<li><a href="https://omniscale.com/">omniscale</a></li>
-		<li><a href="https://github.com/maplibre/maplibre-gl-js">maplibre</a></li>
-		<li><a href="https://water.weather.gov/precip/about.php">national weather service advanced hydrologic prediction service</a></li>
-		<li><a href="https://maputnik.github.io/">maputnik</a></li>
-		<li><a href="https://www.docker.com/">docker</a> / <a href="https://ubuntu.com/">ubuntu</a> / <a href="https://www.gnu.org/">gnu</a> / <a href="https://www.kernel.org/">linux</a></li>
+			<li><a href="https://www.naturalearthdata.com/" target="_blank">natural earth</a></li>
+			<li><a href="https://github.com/pnorman/osmborder" target="_blank">osmborder</a></li>
+			<li><a href="https://omniscale.com/" target="_blank">omniscale</a></li>
+		<li><a href="https://github.com/maplibre/maplibre-gl-js" target="_blank">maplibre</a></li>
+		<li><a href="https://water.weather.gov/precip/about.php" target="_blank">national weather service advanced hydrologic prediction service</a></li>
+		<li><a href="https://maputnik.github.io/" target="_blank">maputnik</a></li>
+		<li><a href="https://www.docker.com/" target="_blank">docker</a> / <a href="https://ubuntu.com/" target="_blank">ubuntu</a> / <a href="https://www.gnu.org/" target="_blank">gnu</a> / <a href="https://www.kernel.org/" target="_blank">linux</a></li>
 		</ul>
 
 		<p>if you notice an issue that can't be fixed by

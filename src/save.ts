@@ -1,16 +1,16 @@
 
-import { LayerControl } from './layer.js';
+import { ButtonControl } from './button.js';
 import * as util from './util.js';
 
 import { MapMouseEvent, IControl, Map } from 'maplibre-gl';
 
 export class SaveControl implements IControl {
-	layerControl: LayerControl;
+	buttonControl: ButtonControl;
 	map: Map | undefined;
 	dummyContainer: HTMLElement | undefined;
 
-	constructor(layerControl: LayerControl) {
-		this.layerControl = layerControl;
+	constructor(buttonControl: ButtonControl) {
+		this.buttonControl = buttonControl;
 	}
 
 	onAdd(map: Map) {
@@ -34,7 +34,7 @@ export class SaveControl implements IControl {
 	}
 
 	fireSavePoint(event: MapMouseEvent) {
-		if(this.layerControl.savePointUrl === undefined) {
+		if(this.buttonControl.savePointUrl === undefined) {
 			return;
 		}
 
@@ -52,7 +52,7 @@ export class SaveControl implements IControl {
 		query.set('point', util.pointToString(event.lngLat, 4));
 		query.set('category', category);
 		query.set('title', title);
-		let url = `${this.layerControl.savePointUrl}?${query}`;
+		let url = `${this.buttonControl.savePointUrl}?${query}`;
 
 		util.ajaxGet(url, (data?: {msg?: string}) => {
 			alert(data?.msg ?? 'failure');

@@ -1,6 +1,6 @@
 
 import * as util from './util.js';
-import { LayerControl, CyclemapLayerSpecification } from './layer.js';
+import { ButtonControl } from './button.js';
 
 import { IControl, LngLat, Map, MapTouchEvent, MapMouseEvent } from 'maplibre-gl';
 import { Feature, FeatureCollection } from 'geojson';
@@ -12,11 +12,11 @@ let startPoint: LngLat | null = null;
 
 export class RouteControl implements IControl {
 	map: Map | undefined;
-	layerControl: LayerControl;
+	buttonControl: ButtonControl;
 	dummyContainer: HTMLElement | undefined;
 
-	constructor(layerControl: LayerControl) {
-		this.layerControl = layerControl;
+	constructor(buttonControl: ButtonControl) {
+		this.buttonControl = buttonControl;
 	}
 
 	onAdd(map: Map) {
@@ -71,13 +71,13 @@ export class RouteControl implements IControl {
 
 	addRoutePoint(point: LngLat) {
 		if(startPoint === null) {
-			this.layerControl.removeLayerButtonById('startPoint');
-			this.layerControl.removeLayerButtonById('endPoint');
-			this.layerControl.removeLayerButtonById('route');
+			this.buttonControl.removeLayerButtonById('startPoint');
+			this.buttonControl.removeLayerButtonById('endPoint');
+			this.buttonControl.removeLayerButtonById('route');
 			
 			startPoint = point;
 			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: 'start'} };
-			this.layerControl.addLayerHelper('startPoint', 'symbol', pointFeature);
+			this.buttonControl.addLayerHelper('startPoint', 'symbol', pointFeature);
 			return;
 		}
 
@@ -92,12 +92,12 @@ export class RouteControl implements IControl {
 
 		util.ajaxGet(url, (data: FeatureCollection) => {
 			//sending in url directly here doesn't work because of somesuch header (Accept: application/json) made the server mad
-			this.layerControl.addLayerHelper('route', 'line', data);
+			this.buttonControl.addLayerHelper('route', 'line', data);
 			let summary = data.features[0]?.properties?.summary;
 			let duration = (summary.duration / 3600 * DURATION_RATIO).toFixed(1);
 			let distance = (summary.distance / 1000).toFixed(0);
 			let pointFeature: Feature = { type: 'Feature', geometry: { type: 'Point', coordinates: [point.lng, point.lat] }, properties: {'marker-symbol': 'marker', title: `end ${duration}h\n${distance}km`} };
-			this.layerControl.addLayerHelper('endPoint', 'symbol', pointFeature);
+			this.buttonControl.addLayerHelper('endPoint', 'symbol', pointFeature);
 		});
 		
 		startPoint = null;

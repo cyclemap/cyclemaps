@@ -1,7 +1,6 @@
 
-import { LayerControl } from './layer.js';
+import { ButtonControl } from './button.js';
 import { SaveControl } from './save.js';
-import { RainControl } from './rain.js';
 import { RouteControl } from './route.js';
 import * as util from './util.js';
 import * as browserImport from './browserImport.js';
@@ -46,11 +45,10 @@ export class MainControl implements IControl {
 			positionOptions: {enableHighAccuracy: true},
 			trackUserLocation: true
 		}));
-		const layerControl = new LayerControl(this);
-		this.map.addControl(layerControl);
-		this.map.addControl(new SaveControl(layerControl));
-		this.map.addControl(new RainControl(layerControl));
-		this.map.addControl(new RouteControl(layerControl));
+		const buttonControl = new ButtonControl(this);
+		this.map.addControl(buttonControl);
+		this.map.addControl(new SaveControl(buttonControl));
+		this.map.addControl(new RouteControl(buttonControl));
 		this.map.scrollZoom.setWheelZoomRate(4 / 450); //default is 1 / 450
 		this.map.on('load', (event: Event) => this.map.resize()); // https://github.com/mapbox/mapbox-gl-js/issues/8982
 	}
@@ -111,15 +109,15 @@ export class MainControl implements IControl {
 		return styleRoot + (style != null ? style : 'style.json');
 	}
 	
-	getLayersQuery() {
-		let cookieLayers = Cookies.get('layers') || null;
-		let layers = this.query.has('layers') ? this.query.get('layers') : cookieLayers;
+	getButtonsQuery() {
+		let cookieButtons = Cookies.get('buttons') || null;
+		let buttons = this.query.has('buttons') ? this.query.get('buttons') : cookieButtons;
 		
-		if(layers != null) {
-			Cookies.set('layers', layers, cookieAttributes);
+		if(buttons != null) {
+			Cookies.set('buttons', buttons, cookieAttributes);
 		}
 
-		return layers;
+		return buttons != null ? buttons : 'buttons.json';
 	}
 
 
