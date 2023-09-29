@@ -1,13 +1,13 @@
 {
 	"buttons": [
-		{ "id": "unpaved road", "class": "layerIds", "group": "style", "layerIds": {
+		{ "id": "gravel road", "class": "layerIds", "group": "style", "layerIds": {
 			"road-unpaved": [{"propertyType": "paint", "property": "line-width", "value": {"base": 1.1, "stops": [[5, 0.75], [20, 5]]}}],
 			"cycleway-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
 			"cycleway-unknown": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
 			"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
 			"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}]
 		}},
-		{ "id": "unpaved?", "class": "layerIds", "group": "style", "layerIds": {
+		{ "id": "dirty", "class": "layerIds", "group": "style", "layerIds": {
 			"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
 			"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
 			"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}]
@@ -79,7 +79,7 @@
 				}
 			}
 		]},
-		{ "id": "settings", "class": "directory", "source": [
+		{ "id": "more", "name": "☰", "class": "directory", "source": [
 			{ "id": "reset", "class": "reset" },
 			{ "id": "heat" },
 			{ "id": "osm" },
