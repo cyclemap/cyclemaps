@@ -93,30 +93,30 @@
 			transform: scale(.75);
 		}
 		@media (orientation: portrait) {
-			.pickerHolder {
+			.buttonHolderEven {
 				flex-direction: column;
 			}
-			.pickerHolder nav {
+			.buttonHolderOdd {
 				flex-direction: row;
 			}
 		}
 		@media (orientation: landscape) {
-			.pickerHolder {
+			.buttonHolderEven {
 				flex-direction: row;
 			}
-			.pickerHolder nav {
+			.buttonHolderOdd {
 				flex-direction: column;
 			}
 		}
-		.pickerHolder {
+		.buttonHolder {
 			display: inline-flex;
 			padding-top: .5rem;
 			padding-left: .5rem;
 		}
-		.pickerHolder nav {
+		.buttonHolder nav {
 			display: inline-flex;
 		}
-		.pickerHolder button {
+		.buttonHolder button {
 			margin: .3rem !important;
 			padding: 0;
 			width: 5.5rem;
@@ -124,7 +124,7 @@
 			font-size: .8rem;
 			font-weight: 700;
 		}
-		.pickerHolder button.active {
+		.buttonHolder button.active {
 			background-color: #48b;
 			color: #fff;
 		}
@@ -135,11 +135,28 @@
 		.guage {
 			display: inline-block;
 		}
+		#gravel-road {
+			background-color: hsl(0, 0%, 75%);
+		}
+		#gravel-road.active {
+			background-color: hsl(0, 0%, 50%);
+		}
+		#trails {
+			background-color: hsl(25, 20%, 60%);
+		}
+		#trails.active {
+			background-color: hsl(25, 60%, 45%);
+		}
+		#paved {
+			background-color: hsl(120, 8%, 50%);
+		}
+		#paved.active {
+			background-color: hsl(120, 60%, 30%);
+		}
 	</style>
 </head>
 <body>
-	<nav id="picker" class="pickerHolder">
-	</nav>
+	<nav id="buttonHolder" class="buttonHolder"></nav>
 	<div id="map" class="map">
 	</div>
 	<div class="rightLegend legend">

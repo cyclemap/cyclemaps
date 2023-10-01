@@ -1,90 +1,85 @@
 {
 	"buttons": [
-		{ "id": "gravel road", "class": "layerIds", "group": "style", "layerIds": {
-			"road-unpaved": [{"propertyType": "paint", "property": "line-width", "value": {"base": 1.1, "stops": [[5, 0.75], [20, 5]]}}],
-			"cycleway-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cycleway-unknown": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}]
-		}},
-		{ "id": "dirty", "class": "layerIds", "group": "style", "layerIds": {
-			"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "none"}]
-		}},
-		{ "id": "paved", "class": "layerIds", "group": "style", "layerIds": {
-			"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cycleway-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "none"}],
-			"cycleway-unknown": [{"propertyType": "layout", "property": "visibility", "value": "none"}]
-		}},
 		{
-			"id": "satellite",
-			"class": "layer",
-			"name": "sat",
-			"active": false,
-			"type": "raster",
-			"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ljbGVtYXB1cyIsImEiOiJjanNhbHRlaGMwMGp2NDNqeG80Mzk2cmExIn0.0OBPtvf3KANeaA6QOCk1yw"]},
-			"beforeId": "satellite-anchor"
-		},
-		{ "id": "weather", "class": "directory", "source": [
-			{
-				"id": "past-rain-1d",
-				"class": "rain",
-				"name": "past rain 1d",
-				"active": false,
-				"type": "raster",
-				"paint": {"raster-opacity": 0.5},
-				"beforeId": "rain-anchor",
-				"group": "weather",
-				"source": {
+			"id": "expand",
+			"class": "directory",
+			"active": true,
+			"name": "◉",
+			"source": [
+				{ "id": "gravel-road", "class": "layerIds", "active": false, "layerIds": {
+					"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
+				}},
+				{ "id": "trails", "class": "layerIds", "active": true, "layerIds": {
+					"cycleway-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
+					"cycleway-unknown": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
+				}},
+				{ "id": "paved", "class": "layerIds", "active": true, "layerIds": {
+					"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
+					"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
+				}},
+				{
+					"id": "satellite",
+					"class": "layer",
+					"name": "sat",
 					"type": "raster",
-					"tileSize": 2048,
-					"tiles" : [
-						"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:28&f=image"
-					]
-				}
-			},
-			{
-				"id": "past-rain-3d",
-				"class": "rain",
-				"name": "past rain 3d",
-				"active": false,
-				"type": "raster",
-				"paint": {"raster-opacity": 0.5},
-				"beforeId": "rain-anchor",
-				"group": "weather",
-				"source": {
-					"type": "raster",
-					"tileSize": 2048,
-					"tiles" : [
-						"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:40&f=image"
-					]
-				}
-			},
-			{
-				"id": "past-rain-5d",
-				"class": "rain",
-				"name": "past rain 5d",
-				"active": false,
-				"type": "raster",
-				"paint": {"raster-opacity": 0.5},
-				"beforeId": "rain-anchor",
-				"group": "weather",
-				"source": {
-					"type": "raster",
-					"tileSize": 2048,
-					"tiles" : [
-						"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:48&f=image"
-					]
-				}
-			}
-		]},
-		{ "id": "more", "name": "☰", "class": "directory", "source": [
-			{ "id": "reset", "class": "reset" },
-			{ "id": "heat" },
-			{ "id": "osm" },
-			{ "id": "g" },
-			{ "id": "about-menu", "name": "about", "class": "about" }
-		]}
+					"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ljbGVtYXB1cyIsImEiOiJjanNhbHRlaGMwMGp2NDNqeG80Mzk2cmExIn0.0OBPtvf3KANeaA6QOCk1yw"]},
+					"beforeId": "satellite-anchor"
+				},
+				{ "id": "weather", "class": "directory", "source": [
+					{
+						"id": "past-rain-1d",
+						"class": "rain",
+						"type": "raster",
+						"paint": {"raster-opacity": 0.5},
+						"beforeId": "rain-anchor",
+						"group": "weather",
+						"source": {
+							"type": "raster",
+							"tileSize": 2048,
+							"tiles" : [
+								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:28&f=image"
+							]
+						}
+					},
+					{
+						"id": "past-rain-3d",
+						"class": "rain",
+						"type": "raster",
+						"paint": {"raster-opacity": 0.5},
+						"beforeId": "rain-anchor",
+						"group": "weather",
+						"source": {
+							"type": "raster",
+							"tileSize": 2048,
+							"tiles" : [
+								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:40&f=image"
+							]
+						}
+					},
+					{
+						"id": "past-rain-5d",
+						"class": "rain",
+						"type": "raster",
+						"paint": {"raster-opacity": 0.5},
+						"beforeId": "rain-anchor",
+						"group": "weather",
+						"source": {
+							"type": "raster",
+							"tileSize": 2048,
+							"tiles" : [
+								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:48&f=image"
+							]
+						}
+					}
+				]},
+				{ "id": "more", "name": "☰", "class": "directory", "source": [
+					{ "id": "reset", "class": "reset" },
+					{ "id": "heat" },
+					{ "id": "osm" },
+					{ "id": "g" },
+					{ "id": "about-menu", "name": "about", "class": "about" }
+				]}
+			]
+		}
 	]
 }

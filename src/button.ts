@@ -28,6 +28,7 @@ export interface CyclemapLayerSpecification {
 	layout?: any;
 	paint?: any;
 	layerIds?: ChangeMap;
+	depth?: number;
 }
 
 class Button {
@@ -37,9 +38,12 @@ class Button {
 	nav: HTMLElement;
 
 	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
+		const id = layer.id;
+		
 		this.layer = layer;
-		const id: string = layer.id;
 		this.buttonControl = buttonControl;
+
+		layer.depth = layer.depth ?? 0;
 		
 		this.buttonControl.buttons[id] = this;
 		
@@ -50,10 +54,8 @@ class Button {
 		
 		this.buttonElement.setAttribute('id', id);
 		this.buttonElement.setAttribute('class', 'maplibregl-ctrl maplibregl-ctrl-group');
-		if(layer.active !== undefined && layer.active === true) {
-			this.select();
-		}
-		const name = layer.name !== undefined ? layer.name : id;
+		
+		const name = layer.name !== undefined ? layer.name : id.replace('-', ' ');
 		this.buttonElement.appendChild(document.createTextNode(name));
 		this.buttonElement.onclick = (event: Event) => this.toggle();
 	}
@@ -67,12 +69,15 @@ class Button {
 		}
 	}
 	select() {
-		this.buttonControl.deselectDirectories();
+		this.deselectDirectory();
 		this.buttonControl.deselectGroup(this.layer.group);
 		this.buttonElement.classList.add('active');
 	}
 	deselect() {
 		this.buttonElement.classList.remove('active');
+		this.deselectDirectory();
+	}
+	deselectDirectory() {
 		this.buttonControl.deselectDirectories();
 	}
 }
@@ -83,14 +88,21 @@ class DirectoryButton extends Button {
 	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
 		super(layer, buttonControl);
 		
+		const className = `buttonHolder${layer.depth!%2==0 ? 'Even' : 'Odd'}`;
+		
 		this.directoryNav = document.createElement('nav');
+		this.directoryNav.classList.add(className);
+		this.nav.classList.add(className);
 		this.nav.appendChild(this.directoryNav);
 
-		if(layer.active === undefined || layer.active !== true) {
+		if(layer.active === undefined || layer.active) {
 			this.directoryNav.style.display = 'none';
 		}
+
+		const children = layer.source as CyclemapLayerSpecification[];
+		children.forEach(child => child.depth = layer.depth!+1);
 		
-		this.buttonControl.addLayerButtons(this.layer.source as CyclemapLayerSpecification[], this.directoryNav as HTMLElement);
+		this.buttonControl.addLayerButtons(layer.source as CyclemapLayerSpecification[], this.directoryNav as HTMLElement);
 	}
 	select() {
 		super.select();
@@ -99,6 +111,9 @@ class DirectoryButton extends Button {
 	deselect() {
 		super.deselect();
 		this.directoryNav.style.display = 'none';
+	}
+	deselectDirectory() {
+		this.buttonControl.deselectDirectories(this.layer.depth);
 	}
 }
 
@@ -349,10 +364,11 @@ class ExternalLinkButton extends Button {
 		case 'osm': return `https://www.openstreetmap.org/edit#map=${this.buttonControl.mainControl.getOsmPoint()}`;
 		case 'heat': return `https://www.strava.com/heatmap#${this.buttonControl.mainControl.getHeatmapPoint()}/hot/ride`;
 		case 'g': return `https://www.google.com/maps/@${this.buttonControl.mainControl.getGPoint()}z`;
+		default: console.error(`external link not found ${this.layer.id}`); break;
 		}
 	}
 }
-
+		
 export class ButtonControl implements IControl {
 	mainControl: MainControl;
 	map: Map | undefined;
@@ -409,7 +425,7 @@ export class ButtonControl implements IControl {
 
 	setupButtons() {
 		const destination = document.getElementsByClassName('maplibregl-ctrl-top-left')[0];
-		destination.append(document.getElementById('picker')!);
+		destination.append(document.getElementById('buttonHolder')!);
 	}
 
 	addLayerButtons(layers: CyclemapLayerSpecification[], root: HTMLElement | null = null) {
@@ -441,7 +457,11 @@ export class ButtonControl implements IControl {
 	};
 
 	generateButton(layer: CyclemapLayerSpecification) {
-		return this.generatorMap[layer.class != undefined ? layer.class : 'externalLink'](layer);
+		const className = layer.class != undefined ? layer.class : 'externalLink';
+		if(!(className in this.generatorMap)) {
+			console.error(`could not find class ${className} in generator map`);
+		}
+		return this.generatorMap[className](layer);
 	}
 
 	addLayerButton(layer: CyclemapLayerSpecification, root: HTMLElement | null = null) {
@@ -450,7 +470,10 @@ export class ButtonControl implements IControl {
 		}
 		
 		const button = this.generateButton(layer);
-		(root != null ? root : document.getElementById('picker')!).appendChild(button.nav);
+		(root != null ? root : document.getElementById('buttonHolder')!).appendChild(button.nav);
+		if(layer.active) {
+			button.select();
+		}
 	}
 
 	removeLayerButton(button: Button) {
@@ -487,15 +510,19 @@ export class ButtonControl implements IControl {
 			return;
 		}
 		Object.values(this.buttons)
-			.filter(button => button.layer.group === group)
-			.filter(button => button.buttonElement.classList.contains('active'))
+			.filter(button =>
+				button.layer.group === group &&
+				button.buttonElement.classList.contains('active'))
 			.forEach(button => button.deselect())
 	}
 
-	deselectDirectories() {
+	deselectDirectories(depth: number | undefined = undefined) {
 		Object.values(this.buttons)
-			.filter(button => button instanceof DirectoryButton)
-			.filter(button => button.buttonElement.classList.contains('active'))
+			.filter(button =>
+				button instanceof DirectoryButton &&
+				(depth === undefined || button.layer.depth === depth) &&
+				!button.layer.active && //ignore the ones that started on
+				button.buttonElement.classList.contains('active'))
 			.forEach(button => button.deselect())
 	}
 }
