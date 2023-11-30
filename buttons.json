@@ -57,7 +57,7 @@
 						}
 					},
 					{
-						"id": "past-rain-5d",
+						"id": "past-rain-7d",
 						"class": "rain",
 						"type": "raster",
 						"paint": {"raster-opacity": 0.5},
@@ -67,7 +67,7 @@
 							"type": "raster",
 							"tileSize": 2048,
 							"tiles" : [
-								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:48&f=image"
+								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:56&f=image"
 							]
 						}
 					}
