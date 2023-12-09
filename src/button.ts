@@ -153,7 +153,7 @@ class LayerButton extends Button {
 				const description = features[0].properties.description;
 
 				if(geometry.type == 'Point') {
-					new Popup()
+					new Popup({maxWidth: 'none'})
 						.setLngLat(geometry.coordinates as [number,number])
 						.setHTML(description)
 						.addTo(map);
@@ -174,8 +174,8 @@ class LayerButton extends Button {
 	getOptions(type: string) {
 		if(type == 'symbol') {
 			return {'layout': {
-				'icon-image': ["concat", ["coalesce", ["get", "marker-symbol"], "marker"], "_11"],
-				'icon-size': 1.5,
+				'icon-image': ["coalesce", ["get", "icon-image"], "marker_11"],
+				'icon-size': ["coalesce", ["get", "icon-size"], 1],
 				'text-field': '{title}',
 				'icon-allow-overlap': true,
 				'text-allow-overlap': true,
@@ -183,7 +183,7 @@ class LayerButton extends Button {
 				'text-font': ['Open Sans Regular'],
 				'text-max-width': 9,
 				'icon-offset': [0, -3],
-				'text-offset': [0, .2],
+				'text-offset': [0, .75],
 				'text-padding': 2,
 				'text-size': 12,
 			},
@@ -388,7 +388,6 @@ export class ButtonControl implements IControl {
 		//this.container = DOM.create('div', 'maplibregl-ctrl maplibregl-ctrl-group');
 		this.container = document.createElement('div');
 		this.container.className = 'maplibregl-ctrl';
-		this.checkAddGeoJsonLayer();
 		this.checkAddButtons();
 		this.setupButtons();
 		return this.container;
@@ -404,7 +403,7 @@ export class ButtonControl implements IControl {
 		if(geoJsonData === null) {
 			return;
 		}
-		this.map!.on('style.load', (event: Event) => this.addLayerHelper('geoJsonData', type, geoJsonData!));
+		this.addLayerHelper('geoJsonData', type, geoJsonData!);
 	}
 
 	checkAddButtons() {
@@ -419,6 +418,8 @@ export class ButtonControl implements IControl {
 			});
 			this.map!.on('load', (event: Event) => {
 				this.addLayerButtons(data.buttons);
+				this.setupIcons();
+				this.checkAddGeoJsonLayer();
 			});
 		});
 	}
@@ -524,5 +525,32 @@ export class ButtonControl implements IControl {
 				!button.layer.active && //ignore the ones that started on
 				button.buttonElement.classList.contains('active'))
 			.forEach(button => button.deselect())
+	}
+
+	setupIcons() {
+		this.map!.loadImage('sprite/2197.png', (error, image) => {
+			if (error) throw error;
+			if(image == null) {
+				console.error('trouble loading image');
+				return;
+			}
+			this.map!.addImage('upright', image);
+		});
+		this.map!.loadImage('sprite/2198.png', (error, image) => {
+			if (error) throw error;
+			if(image == null) {
+				console.error('trouble loading image');
+				return;
+			}
+			this.map!.addImage('downright', image);
+		});
+		this.map!.loadImage('sprite/27a1.png', (error, image) => {
+			if (error) throw error;
+			if(image == null) {
+				console.error('trouble loading image');
+				return;
+			}
+			this.map!.addImage('right', image);
+		});
 	}
 }
