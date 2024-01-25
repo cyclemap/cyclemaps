@@ -74,9 +74,9 @@
 				]},
 				{ "id": "more", "name": "☰", "class": "directory", "source": [
 					{ "id": "reset", "class": "reset" },
-					{ "id": "heat" },
-					{ "id": "osm" },
-					{ "id": "g" },
+					{ "id": "heat", "class": "externalLink", "url": "https://www.strava.com/maps/global-heatmap?style=dark&terrain=false&sport=Ride&gColor=red#{z}/{latitude}/{longitude}" },
+					{ "id": "osm", "class": "externalLink", "url": "https://www.openstreetmap.org/edit#map={z1}/{latitude}/{longitude}" },
+					{ "id": "g", "class": "externalLink", "url": "https://www.google.com/maps/@{latitude},{longitude},{z1}z" },
 					{ "id": "about-menu", "name": "about", "class": "about" }
 				]}
 			]

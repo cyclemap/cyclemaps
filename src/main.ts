@@ -119,22 +119,6 @@ export class MainControl implements IControl {
 
 		return buttons != null ? buttons : 'buttons.json';
 	}
-
-
-	getHeatmapPoint() {
-		var zoom = this.map.getZoom() + 1;
-		return `${zoom.toFixed(1)}/${util.reversedPointToString(this.map.getCenter()).replace(",","/")}`;
-	}
-
-	getOsmPoint() {
-		var zoom = this.map.getZoom() + 1;
-		return `${zoom.toFixed(0)}/${util.pointToString(this.map.getCenter()).replace(",","/")}`;
-	}
-
-	getGPoint() {
-		var zoom = this.map.getZoom() + 1;
-		return `${util.pointToString(this.map.getCenter())},${zoom.toFixed(0)}`;
-	}
 }
 
 export const mainControl = new MainControl();	

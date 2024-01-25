@@ -20,6 +20,7 @@ export interface CyclemapLayerSpecification {
 	id: string;
 	name?: string;
 	class?: string;
+	url?: string;
 	group?: string;
 	type?: string;
 	source: SourceSpecification | CyclemapLayerSpecification[];
@@ -354,18 +355,18 @@ class ExternalLinkButton extends Button {
 	select() {
 		super.select();
 		super.deselect();
-		const url = this.getUrl();
-		if(url !== undefined) {
-			window.open(url);
+		let url = this.layer.url;
+		if(url === undefined) {
+			console.error('url not defined');
+			return;
 		}
-	}
-	getUrl() {
-		switch(this.layer.id) {
-		case 'osm': return `https://www.openstreetmap.org/edit#map=${this.buttonControl.mainControl.getOsmPoint()}`;
-		case 'heat': return `https://www.strava.com/heatmap#${this.buttonControl.mainControl.getHeatmapPoint()}/hot/ride`;
-		case 'g': return `https://www.google.com/maps/@${this.buttonControl.mainControl.getGPoint()}z`;
-		default: console.error(`external link not found ${this.layer.id}`); break;
-		}
+		const map = this.buttonControl.map!;
+		url = url
+			.replace("{z1}", (map.getZoom() + 1).toFixed(0))
+			.replace("{z}", (map.getZoom()).toFixed(0))
+			.replace("{latitude}", map.getCenter().lat.toFixed(5))
+			.replace("{longitude}", map.getCenter().lng.toFixed(5));
+		window.open(url);
 	}
 }
 		
@@ -458,11 +459,13 @@ export class ButtonControl implements IControl {
 	};
 
 	generateButton(layer: CyclemapLayerSpecification) {
-		const className = layer.class != undefined ? layer.class : 'externalLink';
-		if(!(className in this.generatorMap)) {
-			console.error(`could not find class ${className} in generator map`);
+		if(layer.class === undefined) {
+			layer.class = 'externalLink';
 		}
-		return this.generatorMap[className](layer);
+		if(!(layer.class in this.generatorMap)) {
+			console.error(`could not find class ${layer.class} in generator map`);
+		}
+		return this.generatorMap[layer.class](layer);
 	}
 
 	addLayerButton(layer: CyclemapLayerSpecification, root: HTMLElement | null = null) {
