@@ -182,9 +182,7 @@
 	<div id="about" class="about" onClick="document.getElementById('about').style.display = 'none';"><div class="border">
 		<ul>
 		<li>if you notice a problem, please
-		<a class="osm-link" href="#" onclick="
-			window.open(`https://www.openstreetmap.org/edit#map=${window.mainControl.getOsmPoint()}`);
-		">edit osm</a></li>
+		<a class="osm-link" href="#" onclick="window.mainControl.openOsmEdit();">edit osm</a></li>
 		<li>"surface" is how we know what is unpaved</li>
 		<li>changes to osm take two weeks to propagate</li>
 		</ul>
@@ -214,9 +212,7 @@
 		</ul>
 
 		<p>if you notice an issue that can't be fixed by
-		<a class="osm-link" href="#" onclick="
-			window.open(`https://www.openstreetmap.org/edit#map=${window.mainControl.getOsmPoint()}`);
-		">editing osm</a>,
+		<a class="osm-link" href="#" onclick="window.mainControl.openOsmEdit();">editing osm</a>,
 		please <a href="https://github.com/cyclemap/openmaptiles-cycle/issues/new">file a ticket</a>.  if you see a route that SHOULDN'T be a bike route, we want to hear from you: please <a href="https://github.com/cyclemap/openmaptiles-cycle/issues/new">file a ticket</a>!</p>
 	</div></div>
 	<script>

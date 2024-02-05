@@ -348,7 +348,7 @@ class LayerIdsButton extends Button {
 	}
 }
 
-class ExternalLinkButton extends Button {
+export class ExternalLinkButton extends Button {
 	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
 		super(layer, buttonControl);
 	}
@@ -360,13 +360,14 @@ class ExternalLinkButton extends Button {
 			console.error('url not defined');
 			return;
 		}
-		const map = this.buttonControl.map!;
-		url = url
+		window.open(ExternalLinkButton.formatUrl(this.buttonControl.map!, url));
+	}
+	static formatUrl(map: Map, url: string) {
+		return url
 			.replace("{z1}", (map.getZoom() + 1).toFixed(0))
 			.replace("{z}", (map.getZoom()).toFixed(0))
 			.replace("{latitude}", map.getCenter().lat.toFixed(5))
 			.replace("{longitude}", map.getCenter().lng.toFixed(5));
-		window.open(url);
 	}
 }
 		

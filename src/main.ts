@@ -1,5 +1,5 @@
 
-import { ButtonControl } from './button.js';
+import { ButtonControl, ExternalLinkButton } from './button.js';
 import { SaveControl } from './save.js';
 import { RouteControl } from './route.js';
 import * as util from './util.js';
@@ -118,6 +118,10 @@ export class MainControl implements IControl {
 		}
 
 		return buttons != null ? buttons : 'buttons.json';
+	}
+
+	openOsmEdit() {
+		window.open(ExternalLinkButton.formatUrl(this.map!, 'https://www.openstreetmap.org/edit#map={z1}/{latitude}/{longitude}'));
 	}
 }
 
