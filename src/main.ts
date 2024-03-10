@@ -36,7 +36,8 @@ export class MainControl implements IControl {
 			zoom: zoom,
 			hash: true,
 			failIfMajorPerformanceCaveat: true,
-			dragRotate: false
+			dragRotate: false,
+			customAttribution: "openmaptiles &copy;<a href='https://www.openstreetmap.org/copyright' target='_blank'>openstreetmap contributors</a><a href='http://project-osrm.org/' target='_blank'>osrm</a>",
 		});
 		this.map.addControl(this); //handles some click events
 		this.map.addControl(new NavigationControl());

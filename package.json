@@ -6,6 +6,7 @@
 		"build-production": "tsc && rollup --config --environment BUILD:production"
 	},
 	"dependencies": {
+		"@maplibre/maplibre-gl-directions": "^0.6.1",
 		"@types/geojson": "^7946.0.13",
 		"@types/js-cookie": "^3.0.6",
 		"js-cookie": "^3.0.5",
@@ -17,7 +18,7 @@
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@rollup/plugin-strip": "^3.0.4",
 		"@rollup/plugin-terser": "^0.4.4",
-		"rollup": "^3.29.4",
+		"rollup": "^4.12.1",
 		"rollup-plugin-import-css": "^3.4.0",
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.3"
