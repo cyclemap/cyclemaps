@@ -2,8 +2,6 @@
 
 set -e #exit on failure
 
-rm -rf dist/assets
-
 #first time: npm install
-npm run build
+docker run --user=$(id --user):$(id --group) --rm --volume=.:/home --workdir=/home -it node:18 npm run build
 

@@ -22,7 +22,7 @@
 					"class": "layer",
 					"name": "sat",
 					"type": "raster",
-					"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY3ljbGVtYXB1cyIsImEiOiJjanNhbHRlaGMwMGp2NDNqeG80Mzk2cmExIn0.0OBPtvf3KANeaA6QOCk1yw"]},
+					"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN}"]},
 					"beforeId": "satellite-anchor"
 				},
 				{ "id": "weather", "class": "directory", "source": [

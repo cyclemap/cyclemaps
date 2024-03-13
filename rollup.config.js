@@ -4,6 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 import strip from '@rollup/plugin-strip';
 import css from 'rollup-plugin-import-css';
+import dotenv from 'rollup-plugin-dotenv';
 
 const {BUILD} = process.env;
 const production = BUILD === 'production';
@@ -14,6 +15,8 @@ const nodeResolve = resolve({
 	preferBuiltins: false
 });
 
+const cssOptions = {output: 'cyclemaps.css'};
+
 export default {
 	input: ['build/main.js'],
 	output: {
@@ -21,10 +24,10 @@ export default {
 		file: 'dist/cyclemaps.js',
 		format: 'esm',
 		indent: false,
-		banner: '/* MIT License Copyright (c) 2023 Contributors */',
+		banner: '/* MIT License Copyright (c) 2024 Contributors */',
 	},
 	plugins: production ?
-		[nodeResolve, css(), strip(), terser(), commonjs()] :
-		[nodeResolve, css(), commonjs()],
+		[nodeResolve, css(cssOptions), strip({functions: ['console.log', 'assert.*']}), terser(), commonjs(), dotenv()] :
+		[nodeResolve, css(cssOptions), commonjs(), dotenv()],
 };
 

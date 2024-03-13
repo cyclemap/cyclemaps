@@ -3,5 +3,5 @@
 set -e #exit on failure
 
 #first time: npm install
-npm run build-production
+docker run --user=$(id --user):$(id --group) --rm --volume=.:/home --workdir=/home -it node:18 npm run build-production
 
