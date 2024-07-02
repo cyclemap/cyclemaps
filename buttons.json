@@ -17,6 +17,7 @@
 					"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
 					"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
 				}},
+				{ "id": "route", "class": "route" },
 				{
 					"id": "satellite",
 					"class": "layer",
@@ -68,6 +69,21 @@
 							"tileSize": 2048,
 							"tiles" : [
 								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:56&f=image"
+							]
+						}
+					},
+					{
+						"id": "past-rain-30d",
+						"class": "rain",
+						"type": "raster",
+						"paint": {"raster-opacity": 0.5},
+						"beforeId": "rain-anchor",
+						"group": "weather",
+						"source": {
+							"type": "raster",
+							"tileSize": 2048,
+							"tiles" : [
+								"https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/export?bbox={bbox-epsg-3857}&size=512,512&dpi=96&format=png8&transparent=true&bboxSR=3857&imageSR=3857&layers=show:68&f=image"
 							]
 						}
 					}

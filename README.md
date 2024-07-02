@@ -25,7 +25,7 @@
 * you need to set environment variable `CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN`
 * `echo "CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN=$CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN" >.env`
 * `./update.sh`
-* `docker run --user=$(id --user):$(id --group) --rm --volume=.:/home --workdir=/home -it node:18 npm install`
+* `./install.sh`
 * `./build.sh`
 
 ## non server-side layers

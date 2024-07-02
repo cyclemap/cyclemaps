@@ -1,7 +1,6 @@
 
 import { ButtonControl, ExternalLinkButton } from './button.js';
 import { SaveControl } from './save.js';
-import { RouteControl } from './route.js';
 import * as util from './util.js';
 import * as browserImport from './browserImport.js';
 
@@ -37,8 +36,11 @@ export class MainControl implements IControl {
 			hash: true,
 			failIfMajorPerformanceCaveat: true,
 			dragRotate: false,
-			customAttribution: "openmaptiles &copy;<a href='https://www.openstreetmap.org/copyright' target='_blank'>openstreetmap contributors</a><a href='http://project-osrm.org/' target='_blank'>osrm</a>",
+			attributionControl: false,
 		});
+		this.map.addControl(new maplibregl.AttributionControl({
+			customAttribution: 'maplibre', //data attribution comes from the input file
+		}));
 		this.map.addControl(this); //handles some click events
 		this.map.addControl(new NavigationControl());
 		this.map.addControl(new ScaleControl({}));
@@ -49,7 +51,6 @@ export class MainControl implements IControl {
 		const buttonControl = new ButtonControl(this);
 		this.map.addControl(buttonControl);
 		this.map.addControl(new SaveControl(buttonControl));
-		this.map.addControl(new RouteControl(buttonControl));
 		this.map.scrollZoom.setWheelZoomRate(4 / 450); //default is 1 / 450
 		this.map.on('load', (event: Event) => this.map.resize()); // https://github.com/mapbox/mapbox-gl-js/issues/8982
 	}

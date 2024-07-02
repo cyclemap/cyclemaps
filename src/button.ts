@@ -1,5 +1,6 @@
 
 import { MainControl } from './main.js';
+import { RouteControl } from './route.js';
 import * as util from './util.js';
 
 import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
@@ -141,7 +142,6 @@ class LayerButton extends Button {
 			paint: this.layer.paint ?? {},
 			...this.getOptions(this.layer.type!),
 		} as (LayerSpecification & {source?: string | SourceSpecification}), this.layer.beforeId);
-		
 
 		if(this.layer.type === 'symbol') {
 			const map = this.buttonControl.map!;
@@ -267,6 +267,22 @@ class RainButton extends LayerButton {
 	}
 }
 
+class RouteButton extends Button {
+	routeControl: RouteControl;
+	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
+		super(layer, buttonControl);
+		this.routeControl = new RouteControl();
+	}
+	select() {
+		super.select();
+		this.buttonControl.map!.addControl(this.routeControl);
+	}
+	deselect() {
+		this.buttonControl.map!.removeControl(this.routeControl);
+		super.deselect();
+	}
+}
+
 class ResetButton extends Button {
 	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
 		super(layer, buttonControl);
@@ -384,7 +400,7 @@ export class ButtonControl implements IControl {
 
 	onAdd(map: Map) {
 		this.map = map;
-		this.map.on('click', (event: MapMouseEvent) =>
+		this.map!.on('click', (event: MapMouseEvent) =>
 			this.deselectDirectories()
 		);
 		//this.container = DOM.create('div', 'maplibregl-ctrl maplibregl-ctrl-group');
@@ -457,6 +473,7 @@ export class ButtonControl implements IControl {
 		about: layer => new AboutButton(layer, this),
 		layerIds: layer => new LayerIdsButton(layer, this),
 		externalLink: layer => new ExternalLinkButton(layer, this),
+		route: layer => new RouteButton(layer, this),
 	};
 
 	generateButton(layer: CyclemapLayerSpecification) {
@@ -532,29 +549,8 @@ export class ButtonControl implements IControl {
 	}
 
 	setupIcons() {
-		this.map!.loadImage('sprite/2197.png', (error, image) => {
-			if (error) throw error;
-			if(image == null) {
-				console.error('trouble loading image');
-				return;
-			}
-			this.map!.addImage('upright', image);
-		});
-		this.map!.loadImage('sprite/2198.png', (error, image) => {
-			if (error) throw error;
-			if(image == null) {
-				console.error('trouble loading image');
-				return;
-			}
-			this.map!.addImage('downright', image);
-		});
-		this.map!.loadImage('sprite/27a1.png', (error, image) => {
-			if (error) throw error;
-			if(image == null) {
-				console.error('trouble loading image');
-				return;
-			}
-			this.map!.addImage('right', image);
-		});
+		this.map!.loadImage('sprite/2197.png').then(response => this.map!.addImage('upright', response.data));
+		this.map!.loadImage('sprite/2198.png').then(response => this.map!.addImage('downright', response.data));
+		this.map!.loadImage('sprite/27a1.png').then(response => this.map!.addImage('right', response.data));
 	}
 }
