@@ -211,7 +211,7 @@ class LayerButton extends Button {
 		else if(type == 'heatmap') {
 			return {
 				"maxzoom": 16,
-				"minzoom": 9,
+				"minzoom": 7,
 				"paint": {
 					"heatmap-weight":
 						["*",
@@ -220,15 +220,16 @@ class LayerButton extends Button {
 						]
 					,
 					"heatmap-intensity": {
+						"type": "exponential",
 						"stops": [
-							[9, 0.1],
+							[8, 0.1],
 							[16, 3000]
 						]
 					},
 					"heatmap-radius": {
 						"type": "exponential",
 						"stops": [
-							[9, 1],
+							[8, 1],
 							[16, 20]
 						]
 					},
