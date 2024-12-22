@@ -2,5 +2,12 @@
 
 set -e #exit on failure
 
-docker run --user=$(id --user):$(id --group) --rm --volume=.:/home --workdir=/home -it node:22 npm "$@"
+docker run \
+	--interactive \
+	--tty \
+	--rm \
+	--user=$(id --user):$(id --group) \
+	--volume=.:/home \
+	--workdir=/home \
+	node:22 npm "$@"
 
