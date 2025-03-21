@@ -34,7 +34,9 @@ export class MainControl implements IControl {
 			center: new LngLat(longitude, latitude),
 			zoom: zoom,
 			hash: true,
-			failIfMajorPerformanceCaveat: true,
+			canvasContextAttributes: {
+				failIfMajorPerformanceCaveat: true,
+			},
 			dragRotate: false,
 			attributionControl: false,
 		});
