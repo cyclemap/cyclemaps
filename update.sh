@@ -2,12 +2,12 @@
 
 set -e #exit on failure
 
+jq \
+	--compact-output \
+	'.' \
+	style-input.json \
+	>style.json
 
-base='https://tileserver.cyclemaps.org/styles/maptiler-cyclemaps'
-
-curl --output style.json "$base/style.json"
-
-sed --in-place --expression="s#$base#https://cyclemaps.org/sprite#g" style.json
 cp style.json style-normal.json
 sed --expression='s/hsl(25, 60%, 45%)/red/2' style.json >style-red.json
 sed \
@@ -17,9 +17,8 @@ sed \
 	--expression='s/"line-color":"hsl(25, 60%, 45%)","line-width":{[^{}]*}/"line-color":"red","line-width":{"base":1.1,"stops":[[9,4],[18,6]]}/' \
 	style.json >style-highlight.json
 
-mkdir --parents sprite
-
-for filename in sprite{,@2x}.{png,json}; do
-	curl --output sprite/$filename "$base/$filename"
-done
+sed --expression='s#/cyclemaps.pmtiles#/tilemaker.pmtiles#g' \
+	style-red.json >style-tilemaker.json
+sed --expression='s#/cyclemaps.pmtiles#/openmaptiles.pmtiles#g' \
+	style-red.json >style-openmaptiles.json
 
