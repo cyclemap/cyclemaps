@@ -4,6 +4,7 @@ import { SaveControl } from './save.js';
 import * as util from './util.js';
 import * as browserImport from './browserImport.js';
 
+import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -20,6 +21,9 @@ export class MainControl implements IControl {
 
 	constructor() {
 		VectorTextProtocol.addProtocols(maplibregl); //this code includes our osm feature
+		const protocol = new Protocol();
+		maplibregl.addProtocol("pmtiles",protocol.tile);
+		
 		const defaultLatitude = 40;
 		const defaultLongitude = -96;
 		const defaultZoom = 5;

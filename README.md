@@ -17,8 +17,8 @@
 
 ## notes
 
-* see about link for technologies and licensing
-* back-end repository here:  [my edits to openmaptiles](https://github.com/cyclemap/openmaptiles-cycle/)
+* see about link for technologies, licensing, and thanks
+* [our script to run tilemaker is here](https://github.com/cyclemap/tilemaker-config)
 
 ## first time setup
 
