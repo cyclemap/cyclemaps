@@ -28,9 +28,9 @@ export class MainControl implements IControl {
 		const defaultLongitude = -96;
 		const defaultZoom = 5;
 
-		let latitude = +(Cookies.get('latitude') || defaultLatitude);
-		let longitude = +(Cookies.get('longitude') || defaultLongitude);
-		let zoom = +(Cookies.get('zoom') || defaultZoom);
+		const latitude = +(Cookies.get('latitude') || defaultLatitude);
+		const longitude = +(Cookies.get('longitude') || defaultLongitude);
+		const zoom = +(Cookies.get('zoom') || defaultZoom);
 
 		this.map = new Map({
 			container: 'map',
@@ -81,7 +81,7 @@ export class MainControl implements IControl {
 	}
 	
 	checkZoom() {
-		let highZoomEnabled = this.map.getZoom() >= highZoom;
+		const highZoomEnabled = this.map.getZoom() >= highZoom;
 		document.getElementById('footLegend')!.style.opacity = (highZoomEnabled ? 1 : 0).toString();
 	}
 	
@@ -89,7 +89,7 @@ export class MainControl implements IControl {
 		if(this.map.isMoving()) {
 			return;
 		}
-		let latitude = this.map.getCenter().lat, longitude = this.map.getCenter().lng, zoom = this.map.getZoom();
+		const latitude = this.map.getCenter().lat, longitude = this.map.getCenter().lng, zoom = this.map.getZoom();
 
 		Cookies.set('latitude', latitude.toString(), cookieAttributes);
 		Cookies.set('longitude', longitude.toString(), cookieAttributes);
@@ -105,9 +105,9 @@ export class MainControl implements IControl {
 	}
 
 	getStyleQuery() {
-		let styleRoot = '';
-		let cookieStyle = Cookies.get('style') || null;
-		let style = this.query.has('style') ? `style-${this.query.get('style')}.json` : cookieStyle;
+		const styleRoot = '';
+		const cookieStyle = Cookies.get('style') || null;
+		const style = this.query.has('style') ? `style-${this.query.get('style')}.json` : cookieStyle;
 
 		
 		if(style != null) {
@@ -118,8 +118,8 @@ export class MainControl implements IControl {
 	}
 	
 	getButtonsQuery() {
-		let cookieButtons = Cookies.get('buttons') || null;
-		let buttons = this.query.has('buttons') ? this.query.get('buttons') : cookieButtons;
+		const cookieButtons = Cookies.get('buttons') || null;
+		const buttons = this.query.has('buttons') ? this.query.get('buttons') : cookieButtons;
 		
 		if(buttons != null) {
 			Cookies.set('buttons', buttons, cookieAttributes);

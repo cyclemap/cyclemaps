@@ -21,8 +21,14 @@ export interface CyclemapLayerSpecification {
 	id: string;
 	name?: string;
 	class?: string;
+	group?: string; // deselect others when one part of the group is selected
+	depth?: number;
+	
+	// ExternalLinkButton
 	url?: string;
-	group?: string;
+	target?: string;
+	
+	// LayerButton
 	type?: string;
 	source: SourceSpecification | CyclemapLayerSpecification[];
 	beforeId?: string;
@@ -30,7 +36,6 @@ export interface CyclemapLayerSpecification {
 	layout?: any;
 	paint?: any;
 	layerIds?: ChangeMap;
-	depth?: number;
 }
 
 class Button {
@@ -372,12 +377,13 @@ export class ExternalLinkButton extends Button {
 	select() {
 		super.select();
 		super.deselect();
-		let url = this.layer.url;
+		const url = this.layer.url;
 		if(url === undefined) {
 			console.error('url not defined');
 			return;
 		}
-		window.open(ExternalLinkButton.formatUrl(this.buttonControl.map!, url));
+		const target = this.layer.target ?? '_blank';
+		window.open(ExternalLinkButton.formatUrl(this.buttonControl.map!, url), target);
 	}
 	static formatUrl(map: Map, url: string) {
 		return url
