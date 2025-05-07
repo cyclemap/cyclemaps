@@ -38,21 +38,21 @@ export class SaveControl implements IControl {
 			return;
 		}
 
-		let category = prompt('please enter a category', 'edited');
+		const category = prompt('please enter a category', 'edited');
 		if(category == null) {
 			return;
 		}
 
-		let title = prompt('please enter a title', '');
+		const title = prompt('please enter a title', '');
 		if(title == null) {
 			return;
 		}
 		
-		let query = new URLSearchParams();
+		const query = new URLSearchParams();
 		query.set('point', util.pointToString(event.lngLat, 4));
 		query.set('category', category);
 		query.set('title', title);
-		let url = `${this.buttonControl.savePointUrl}?${query}`;
+		const url = `${this.buttonControl.savePointUrl}?${query}`;
 
 		util.ajaxGet(url, (data?: {msg?: string}) => {
 			alert(data?.msg ?? 'failure');
