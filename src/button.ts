@@ -186,7 +186,7 @@ class LayerButton extends Button {
 				'icon-allow-overlap': true,
 				'text-allow-overlap': true,
 				'text-anchor': 'top',
-				'text-font': ['Open Sans Regular'],
+				'text-font': ['Noto Sans Regular'],
 				'text-max-width': 9,
 				'icon-offset': [0, -3],
 				'text-offset': [0, .75],
