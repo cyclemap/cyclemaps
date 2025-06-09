@@ -17,8 +17,6 @@ sed \
 	--expression='s/"line-color":"hsl(25, 60%, 45%)","line-width":{[^{}]*}/"line-color":"red","line-width":{"base":1.1,"stops":[[9,4],[18,6]]}/' \
 	style.json >style-highlight.json
 
-sed --expression='s#/cyclemaps.pmtiles#/tilemaker.pmtiles#g' \
-	style-red.json >style-tilemaker.json
 sed --expression='s#/cyclemaps.pmtiles#/openmaptiles.pmtiles#g' \
 	style-red.json >style-openmaptiles.json
 
