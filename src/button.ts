@@ -213,6 +213,13 @@ class LayerButton extends Button {
 				'line-opacity': .4,
 			}};
 		}
+		else if(type == 'fill') {
+			return {'paint': {
+				'fill-color': '#00d',
+				'fill-outline-color': '#00a',
+				'fill-opacity': .12,
+			}};
+		}
 		else if(type == 'heatmap') {
 			return {
 				"maxzoom": 16,

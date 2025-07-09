@@ -44,6 +44,7 @@ export class MainControl implements IControl {
 			dragRotate: false,
 			attributionControl: false,
 		});
+		this.map.showTileBoundaries = this.query.has('tile');
 		this.map.addControl(new maplibregl.AttributionControl({
 			customAttribution: 'maplibre', //data attribution comes from the input file
 		}));

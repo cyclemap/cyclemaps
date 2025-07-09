@@ -20,3 +20,6 @@ sed \
 sed --expression='s#/cyclemaps.pmtiles#/openmaptiles.pmtiles#g' \
 	style-red.json >style-openmaptiles.json
 
+sed --expression='s#/cyclemaps.pmtiles#/testing.pmtiles#g' \
+	style-red.json >style-testing.json
+
