@@ -9,5 +9,5 @@ docker run \
 	--user=$(id --user):$(id --group) \
 	--volume=.:/home \
 	--workdir=/home \
-	node:22 npm "$@"
+	node:24 npm "$@"
 
