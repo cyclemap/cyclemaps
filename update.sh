@@ -8,7 +8,6 @@ jq \
 	style-input.json \
 	>style.json
 
-cp style.json style-normal.json
 sed --expression='s/hsl(25, 60%, 45%)/red/2' style.json >style-red.json
 sed \
 	--expression='s/hsl(120, 60%, 30%)/hsl(0, 0%, 100%)/g' \

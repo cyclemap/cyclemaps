@@ -1,6 +1,6 @@
 
 import { MainControl } from './main.js';
-import { RouteControl } from './route.js';
+import { NavigationControl } from './navigation.js';
 import * as util from './util.js';
 
 import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
@@ -280,18 +280,18 @@ class RainButton extends LayerButton {
 	}
 }
 
-class RouteButton extends Button {
-	routeControl: RouteControl;
+class NavigationButton extends Button {
+	navigationControl: NavigationControl;
 	constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
 		super(layer, buttonControl);
-		this.routeControl = new RouteControl();
+		this.navigationControl = new NavigationControl();
 	}
 	select() {
 		super.select();
-		this.buttonControl.map!.addControl(this.routeControl);
+		this.buttonControl.map!.addControl(this.navigationControl);
 	}
 	deselect() {
-		this.buttonControl.map!.removeControl(this.routeControl);
+		this.buttonControl.map!.removeControl(this.navigationControl);
 		super.deselect();
 	}
 }
@@ -487,7 +487,7 @@ export class ButtonControl implements IControl {
 		about: layer => new AboutButton(layer, this),
 		layerIds: layer => new LayerIdsButton(layer, this),
 		externalLink: layer => new ExternalLinkButton(layer, this),
-		route: layer => new RouteButton(layer, this),
+		navigation: layer => new NavigationButton(layer, this),
 	};
 
 	generateButton(layer: CyclemapLayerSpecification) {

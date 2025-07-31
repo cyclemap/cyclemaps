@@ -115,7 +115,7 @@ export class MainControl implements IControl {
 			Cookies.set('style', style, cookieAttributes);
 		}
 
-		return styleRoot + (style != null ? style : 'style.json');
+		return styleRoot + (style != null && style != 'default' ? style : 'style.json');
 	}
 	
 	getButtonsQuery() {

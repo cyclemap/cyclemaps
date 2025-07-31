@@ -6,6 +6,9 @@
 			"active": true,
 			"name": "◉",
 			"source": [
+				{ "id": "routes", "class": "layerIds", "active": false, "layerIds": {
+					"cycle-route": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
+				}},
 				{ "id": "gravel-road", "class": "layerIds", "active": false, "layerIds": {
 					"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
 				}},
@@ -17,7 +20,7 @@
 					"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
 					"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
 				}},
-				{ "id": "route", "class": "route" },
+				{ "id": "navigation", "class": "navigation" },
 				{
 					"id": "satellite",
 					"class": "layer",

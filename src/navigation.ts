@@ -7,7 +7,7 @@ import { IControl, Map } from 'maplibre-gl';
 const DURATION_RATIO = 0.7; //discount the duration, mapbox cycling speed is crazy-slow
 const CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN = process.env.CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN;
 
-export class RouteControl implements IControl {
+export class NavigationControl implements IControl {
 	map: Map | undefined;
 	directions: MapLibreGlDirections | undefined;
 	dummyContainer: HTMLElement | undefined;
