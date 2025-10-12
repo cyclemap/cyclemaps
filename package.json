@@ -13,21 +13,21 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/js-cookie": "^3.0.6",
 		"js-cookie": "^3.0.5",
-		"maplibre-gl": "^5.6.1",
+		"maplibre-gl": "^5.9.0",
 		"maplibre-gl-vector-text-protocol": "^0.0.5",
 		"pmtiles": "^4.3.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-commonjs": "^28.0.6",
-		"@rollup/plugin-node-resolve": "^16.0.1",
+		"@rollup/plugin-node-resolve": "^16.0.2",
 		"@rollup/plugin-strip": "^3.0.4",
 		"@rollup/plugin-terser": "^0.4.4",
-		"@types/node": "^24.0.14",
-		"dotenv": "^17.2.0",
-		"rollup": "^4.45.1",
+		"@types/node": "^24.7.2",
+		"dotenv": "^17.2.3",
+		"rollup": "^4.52.4",
 		"rollup-plugin-dotenv": "^0.5.1",
-		"rollup-plugin-import-css": "^3.5.8",
+		"rollup-plugin-import-css": "^4.0.2",
 		"tslib": "^2.8.1",
-		"typescript": "^5.8.3"
+		"typescript": "^5.9.3"
 	}
 }
