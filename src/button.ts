@@ -6,7 +6,7 @@ import * as util from './util.js';
 import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 
-const DEFAULT_GEOJSON_TYPE = 'line';
+const DEFAULT_GEOJSON_TYPE = 'symbol';
 
 
 interface Change {
