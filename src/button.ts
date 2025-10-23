@@ -1,7 +1,7 @@
 
-import { MainControl } from './main.js';
-import { NavigationControl } from './navigation.js';
-import * as util from './util.js';
+import { MainControl } from './main';
+import { NavigationControl } from './navigation';
+import * as util from './util';
 
 import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
 import { Feature, FeatureCollection, Geometry } from 'geojson';

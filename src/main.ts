@@ -1,14 +1,14 @@
 
-import { ButtonControl, ExternalLinkButton } from './button.js';
-import { SaveControl } from './save.js';
-import * as util from './util.js';
-import * as browserImport from './browserImport.js';
+import { ButtonControl, ExternalLinkButton } from './button';
+import { SaveControl } from './save';
+import * as util from './util';
+import * as browserImport from './browserImport';
 
 import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import maplibregl, { IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
+import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
 
 const highZoom = 12;
 
@@ -22,7 +22,7 @@ export class MainControl implements IControl {
 	constructor() {
 		VectorTextProtocol.addProtocols(maplibregl); //this code includes our osm feature
 		const protocol = new Protocol();
-		maplibregl.addProtocol("pmtiles",protocol.tile);
+		addProtocol("pmtiles",protocol.tile);
 		
 		const defaultLatitude = 40;
 		const defaultLongitude = -96;
@@ -45,7 +45,7 @@ export class MainControl implements IControl {
 			attributionControl: false,
 		});
 		this.map.showTileBoundaries = this.query.has('tile');
-		this.map.addControl(new maplibregl.AttributionControl({
+		this.map.addControl(new AttributionControl({
 			customAttribution: 'maplibre', //data attribution comes from the input file
 		}));
 		this.map.addControl(this); //handles some click events
