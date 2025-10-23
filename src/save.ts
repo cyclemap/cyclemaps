@@ -1,6 +1,6 @@
 
-import { ButtonControl } from './button.js';
-import * as util from './util.js';
+import { ButtonControl } from './button';
+import * as util from './util';
 
 import { MapMouseEvent, IControl, Map } from 'maplibre-gl';
 
