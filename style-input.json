@@ -2180,6 +2180,7 @@
 				]
 			],
 			"layout": {
+				"symbol-sort-key": ["get", "rank"],
 				"text-field": "{name:latin}\n{name:nonlatin}",
 				"text-font": [
 					"Noto Sans Regular"
