@@ -34,7 +34,7 @@ export class NavigationControl implements IControl {
 			console.info(`### on addwaypoint`);
 		});
 		directions.on("fetchroutesend", (event) => {
-			const summary = event.data?.routes[0];
+			const summary = event.data.directions?.routes[0];
 			const duration = ((summary?.duration as number) / 3600 * DURATION_RATIO).toFixed(1);
 			const distance = ((summary?.distance as number) / 1000).toFixed(0);
 			console.info(`${duration}h ${distance}km`);
