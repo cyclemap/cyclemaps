@@ -7,7 +7,6 @@ import * as browserImport from './browserImport';
 import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
-import 'maplibre-gl/dist/maplibre-gl.css';
 import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
 
 const highZoom = 12;
