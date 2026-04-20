@@ -8,14 +8,11 @@ const DURATION_RATIO = 0.7; //discount the duration, mapbox cycling speed is cra
 const CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN = process.env.CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN;
 
 export class NavigationControl implements IControl {
-	map: Map | undefined;
-	directions: MapLibreGlDirections | undefined;
-	dummyContainer: HTMLElement | undefined;
+	private map: Map | undefined;
+	private directions: MapLibreGlDirections | undefined;
+	private dummyContainer: HTMLElement | undefined;
 
-	constructor() {
-	}
-
-	onAdd(map: Map) {
+	public onAdd(map: Map) {
 		this.map = map;
 		this.dummyContainer = document.createElement('div');
 		
@@ -52,7 +49,7 @@ export class NavigationControl implements IControl {
 		return this.dummyContainer;
 	}
 	
-	onRemove(map: Map) {
+	public onRemove(map: Map) {
 		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
 		this.map = undefined;
 

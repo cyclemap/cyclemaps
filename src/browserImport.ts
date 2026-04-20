@@ -1,9 +1,9 @@
 
 //this seems terrible, someone fix javascript
 
-import { mainControl } from './main';
+import { MainControl } from './main';
 
-export function setupImports() {
+export function setupImports(mainControl: MainControl) {
 	(window as any).mainControl = mainControl;
 }
 
