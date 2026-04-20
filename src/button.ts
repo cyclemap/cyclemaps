@@ -29,6 +29,7 @@ export interface CyclemapLayerSpecification {
 	target?: string;
 	
 	// LayerButton
+	options?: any;
 	type?: string;
 	source: SourceSpecification | CyclemapLayerSpecification[];
 	beforeId?: string;
@@ -145,7 +146,7 @@ class LayerButton extends Button {
 			source: id,
 			layout: this.layer.layout ?? {},
 			paint: this.layer.paint ?? {},
-			...this.getOptions(this.layer.type!),
+			...LayerButton.getOptions(this.layer),
 		} as (LayerSpecification & {source?: string | SourceSpecification}), this.layer.beforeId);
 
 		if(this.layer.type === 'symbol') {
@@ -177,8 +178,8 @@ class LayerButton extends Button {
 		this.buttonControl.map!.removeLayer(id);
 	}
 
-	private getOptions(type: string) {
-		if(type == 'symbol') {
+	private static getOptions(layer: CyclemapLayerSpecification) {
+		if(layer.type! == 'symbol') {
 			return {'layout': {
 				'icon-image': ["coalesce", ["get", "icon-image"], "marker_11"],
 				'icon-size': ["coalesce", ["get", "icon-size"], 1],
@@ -200,7 +201,7 @@ class LayerButton extends Button {
 				'text-halo-width': 2,
 			}};
 		}
-		else if(type == 'line') {
+		else if(layer.type! == 'line') {
 			return {'layout': {
 				'line-join': 'round',
 			},
@@ -213,14 +214,14 @@ class LayerButton extends Button {
 				'line-opacity': .4,
 			}};
 		}
-		else if(type == 'fill') {
+		else if(layer.type! == 'fill') {
 			return {'paint': {
 				'fill-color': '#00d',
 				'fill-outline-color': '#00a',
 				'fill-opacity': .12,
 			}};
 		}
-		else if(type == 'heatmap') {
+		else if(layer.type! == 'heatmap') {
 			return {
 				"maxzoom": 16,
 				"minzoom": 7,
@@ -228,7 +229,7 @@ class LayerButton extends Button {
 					"heatmap-weight":
 						["*",
 							["coalesce", ["get", "count"], 1],
-							0.00001
+							layer.options?.weight ?? 0.00001,
 						]
 					,
 					"heatmap-intensity": {
@@ -259,10 +260,10 @@ class LayerButton extends Button {
 				}
 			}
 		}
-		else if(type == 'raster') {
+		else if(layer.type! == 'raster') {
 			return;
 		}
-		console.error('unknown type: ', type);
+		console.error('unknown type: ', layer.type!);
 	}
 }
 
@@ -426,11 +427,27 @@ export class ButtonControl implements IControl {
 	}
 	
 	private checkAddGeoJsonLayer() {
-		const geoJsonData: string | null = MainControl.getQuery('geo'), type: string = MainControl.getQuery('type') ?? DEFAULT_GEOJSON_TYPE;
+		const geoJsonData: string | null = MainControl.getQuery('geo');
+		const type: string = MainControl.getQuery('type') ?? DEFAULT_GEOJSON_TYPE;
+		const options: any = JSON.parse(MainControl.getQuery('options') ?? '{}');
 		if(geoJsonData === null) {
 			return;
 		}
-		this.addLayerHelper('geoJsonData', type, geoJsonData!);
+		this.addLayerHelper('geoJsonData', type, options, geoJsonData!);
+	}
+	
+	private addLayerHelper(id: string, type: string, options: any, data: FeatureCollection | Feature | string) {
+		this.addLayerButton({
+			id,
+			type,
+			options,
+			'class': 'layer',
+			'source': {
+				'type': 'geojson',
+				data
+			},
+			'active': true
+		});
 	}
 
 	private async checkAddButtons() {
@@ -470,10 +487,6 @@ export class ButtonControl implements IControl {
 		}
 	}
 	*/
-
-	private addLayerHelper(id: string, type: string, data: FeatureCollection | Feature | string) {
-		this.addLayerButton({"id": id, "type": type, "class": "layer", "source": {"type": "geojson", "data": data}, "active": true});
-	}
 
 	private generatorMap: {[layerClass: string]: (layer: CyclemapLayerSpecification)=>Button} = {
 		directory: layer => new DirectoryButton(layer, this),
