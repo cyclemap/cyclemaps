@@ -1,7 +1,8 @@
 
 import { ButtonControl, ExternalLinkButton } from './button';
 import { SaveControl } from './save';
-import * as util from './util';
+import { FetchUtil } from './fetchUtil';
+import { PointUtil } from './pointUtil';
 import * as browserImport from './browserImport';
 
 import { Protocol } from "pmtiles";
@@ -13,12 +14,22 @@ const highZoom = 12;
 
 const cookieAttributes: Cookies.CookieAttributes = { expires: 182 };
 
-export class MainControl implements IControl {
-	map: Map;
-	dummyContainer: HTMLElement | undefined;
-	query = new URLSearchParams(window.location.search);
+// this listing has a filename that we use to find the tile results
+const TILESERVER_LISTING = 'https://tileserver.cyclemaps.org/cyclemaps.listing';
+// this text gets replaced with the cyclemaps listing result in the openmaptiles style, the rest is used as-is (the protocol and the server)
+const TILESERVER_REPLACE = 'cyclemaps.pmtiles';
 
-	constructor() {
+export class MainControl implements IControl {
+	private map: Map;
+	private dummyContainer: HTMLElement | undefined;
+	private static query = new URLSearchParams(window.location.search);
+
+	public static async setup() {
+		const mainControl = new MainControl(await MainControl.getStyle());	
+		browserImport.setupImports(mainControl);
+	}
+
+	public constructor(style: string) {
 		VectorTextProtocol.addProtocols(maplibregl); //this code includes our osm feature
 		const protocol = new Protocol();
 		addProtocol("pmtiles",protocol.tile);
@@ -33,7 +44,7 @@ export class MainControl implements IControl {
 
 		this.map = new Map({
 			container: 'map',
-			style: this.getStyleQuery(),
+			style,
 			center: new LngLat(longitude, latitude),
 			zoom: zoom,
 			hash: true,
@@ -43,7 +54,7 @@ export class MainControl implements IControl {
 			dragRotate: false,
 			attributionControl: false,
 		});
-		this.map.showTileBoundaries = this.query.has('tile');
+		this.map.showTileBoundaries = MainControl.query.has('tile');
 		this.map.addControl(new AttributionControl({
 			customAttribution: 'maplibre', //data attribution comes from the input file
 		}));
@@ -54,25 +65,25 @@ export class MainControl implements IControl {
 			positionOptions: {enableHighAccuracy: true},
 			trackUserLocation: true
 		}));
-		const buttonControl = new ButtonControl(this);
+		const buttonControl = new ButtonControl();
 		this.map.addControl(buttonControl);
 		this.map.addControl(new SaveControl(buttonControl));
 		this.map.scrollZoom.setWheelZoomRate(4 / 450); //default is 1 / 450
 		this.map.on('load', (event: Event) => this.map.resize()); // https://github.com/mapbox/mapbox-gl-js/issues/8982
 	}
 
-	onAdd(map: Map) {
+	public onAdd(map: Map) {
 		this.dummyContainer = document.createElement('div');
 		this.addMoveListener();
 		this.addClickListeners();
 		return this.dummyContainer;
 	}
 	
-	onRemove(map: Map) {
+	public onRemove(map: Map) {
 		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
 	}
 	
-	addMoveListener() {
+	private addMoveListener() {
 		this.map.on('moveend', () => this.checkMove());
 		this.checkMove();
 		
@@ -80,12 +91,12 @@ export class MainControl implements IControl {
 		this.checkZoom();
 	}
 	
-	checkZoom() {
+	private checkZoom() {
 		const highZoomEnabled = this.map.getZoom() >= highZoom;
 		document.getElementById('footLegend')!.style.opacity = (highZoomEnabled ? 1 : 0).toString();
 	}
 	
-	checkMove() {
+	private checkMove() {
 		if(this.map.isMoving()) {
 			return;
 		}
@@ -96,18 +107,35 @@ export class MainControl implements IControl {
 		Cookies.set('zoom', zoom.toString(), cookieAttributes);
 	}
 
-	addClickListeners() {
+	private addClickListeners() {
 		this.map.on('mouseup', (event: MapMouseEvent) => {
 			if(event.originalEvent.shiftKey) {
-				alert(`point:  ${util.pointToString(event.lngLat, 4)}`);
+				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)}`);
 			}
 		});
 	}
 
-	getStyleQuery() {
+	/**
+	 * get the content of the style and modify it to have the "listing" filename in it
+	 * 
+	 * why do we even do this?
+	 * 
+	 * i am not sure.  there is probably a thing in pmtiles or maplibre that doesn't correctly notice when the pmtiles content changes.
+	 * 
+	 * replace this method call with just getStyleQuery() to test the normal behavior
+	 */
+	private static async getStyle(): Promise<string> {
+		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING)).trim();
+
+		const data = await FetchUtil.fetchAndParse(this.getStyleQuery());
+		data.sources.openmaptiles.url = data.sources.openmaptiles.url.replaceAll(TILESERVER_REPLACE, listingFilename);
+		return data;
+	}
+
+	private static getStyleQuery() {
 		const styleRoot = '';
 		const cookieStyle = Cookies.get('style') || null;
-		const style = this.query.has('style') ? `style-${this.query.get('style')}.json` : cookieStyle;
+		const style = MainControl.query.has('style') ? `style-${MainControl.query.get('style')}.json` : cookieStyle;
 
 		
 		if(style != null) {
@@ -116,10 +144,14 @@ export class MainControl implements IControl {
 
 		return styleRoot + (style != null && style != 'style-default.json' ? style : 'style.json');
 	}
+
+	public static getQuery(key: string): string | null {
+		return MainControl.query.get(key);
+	}
 	
-	getButtonsQuery() {
+	public static getButtonsQuery() {
 		const cookieButtons = Cookies.get('buttons') || null;
-		const buttons = this.query.has('buttons') ? this.query.get('buttons') : cookieButtons;
+		const buttons = MainControl.query.has('buttons') ? MainControl.query.get('buttons') : cookieButtons;
 		
 		if(buttons != null) {
 			Cookies.set('buttons', buttons, cookieAttributes);
@@ -128,12 +160,11 @@ export class MainControl implements IControl {
 		return buttons != null ? buttons : 'buttons.json';
 	}
 
-	openOsmEdit() {
+	private openOsmEdit() {
 		window.open(ExternalLinkButton.formatUrl(this.map!, 'https://www.openstreetmap.org/edit#map={z1}/{latitude}/{longitude}'));
 	}
 }
 
-export const mainControl = new MainControl();	
-browserImport.setupImports();
+MainControl.setup().then(() => {});
 
 

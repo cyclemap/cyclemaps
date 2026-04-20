@@ -1,39 +1,41 @@
 
 import { ButtonControl } from './button';
-import * as util from './util';
+import { PointUtil } from './pointUtil';
+import { FetchUtil } from './fetchUtil';
 
 import { MapMouseEvent, IControl, Map } from 'maplibre-gl';
 
 export class SaveControl implements IControl {
-	buttonControl: ButtonControl;
-	map: Map | undefined;
-	dummyContainer: HTMLElement | undefined;
+	private buttonControl: ButtonControl;
+	private map: Map | undefined;
+	private dummyContainer: HTMLElement | undefined;
 
-	constructor(buttonControl: ButtonControl) {
+	public constructor(buttonControl: ButtonControl) {
 		this.buttonControl = buttonControl;
 	}
 
-	onAdd(map: Map) {
+	public onAdd(map: Map) {
 		this.map = map;
 		this.dummyContainer = document.createElement('div');
 		this.addSavePointListener();
 		return this.dummyContainer;
 	}
 	
-	onRemove(map: Map) {
+	public onRemove(map: Map) {
 		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
 		this.map = undefined;
 	}
 	
-	addSavePointListener() {
+	private addSavePointListener() {
 		this.map!.on('click', (event: MapMouseEvent) => {
 			if(event.originalEvent.ctrlKey || event.originalEvent.metaKey) {
-				this.fireSavePoint(event);
+				this.fireSavePoint(event)
+					.then(() => {});
 			}
 		});
 	}
 
-	fireSavePoint(event: MapMouseEvent) {
+	private async fireSavePoint(event: MapMouseEvent) {
 		if(this.buttonControl.savePointUrl === undefined) {
 			return;
 		}
@@ -49,14 +51,13 @@ export class SaveControl implements IControl {
 		}
 		
 		const query = new URLSearchParams();
-		query.set('point', util.pointToString(event.lngLat, 4));
+		query.set('point', PointUtil.pointToString(event.lngLat, 4));
 		query.set('category', category);
 		query.set('title', title);
 		const url = `${this.buttonControl.savePointUrl}?${query}`;
 
-		util.ajaxGet(url, (data?: {msg?: string}) => {
-			alert(data?.msg ?? 'failure');
-		});
+		const data: {msg?: string} = await FetchUtil.fetchAndParse(url);
+		alert(data?.msg ?? 'failure');
 	}
 
 }
