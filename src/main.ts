@@ -9,6 +9,7 @@ import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
 const highZoom = 12;
 
