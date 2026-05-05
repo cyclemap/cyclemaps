@@ -24,12 +24,12 @@ export class MainControl implements IControl {
 	private dummyContainer: HTMLElement | undefined;
 	private static query = new URLSearchParams(window.location.search);
 
-	public static async setup() {
-		const mainControl = new MainControl(await MainControl.getStyle());	
+	public static async setup(container: string) {
+		const mainControl = new MainControl(container, await MainControl.getStyle());	
 		browserImport.setupImports(mainControl);
 	}
 
-	public constructor(style: string) {
+	public constructor(container: string, style: string) {
 		VectorTextProtocol.addProtocols(maplibregl); //this code includes our osm feature
 		const protocol = new Protocol();
 		addProtocol("pmtiles",protocol.tile);
@@ -43,7 +43,7 @@ export class MainControl implements IControl {
 		const zoom = +(Cookies.get('zoom') || defaultZoom);
 
 		this.map = new Map({
-			container: 'map',
+			container,
 			style,
 			center: new LngLat(longitude, latitude),
 			zoom: zoom,
@@ -93,7 +93,11 @@ export class MainControl implements IControl {
 	
 	private checkZoom() {
 		const highZoomEnabled = this.map.getZoom() >= highZoom;
-		document.getElementById('footLegend')!.style.opacity = (highZoomEnabled ? 1 : 0).toString();
+		const footLegend = document.getElementById('footLegend');
+		if(footLegend === null) {
+			return;
+		}
+		footLegend.style.opacity = (highZoomEnabled ? 1 : 0).toString();
 	}
 	
 	private checkMove() {
@@ -165,6 +169,6 @@ export class MainControl implements IControl {
 	}
 }
 
-MainControl.setup().then(() => {});
+MainControl.setup('map').then(() => {});
 
 

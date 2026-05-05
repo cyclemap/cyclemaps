@@ -468,8 +468,12 @@ export class ButtonControl implements IControl {
 	}
 
 	private setupButtons() {
-		const destination = document.getElementsByClassName('maplibregl-ctrl-top-left')[0];
-		destination.append(document.getElementById('buttonHolder')!);
+		const buttonHolder = document.getElementById('buttonHolder');
+
+		if(buttonHolder !== null) {
+			const destination = document.getElementsByClassName('maplibregl-ctrl-top-left')[0];
+			destination.append(document.getElementById('buttonHolder')!);
+		}
 	}
 
 	public addLayerButtons(layers: CyclemapLayerSpecification[], root: HTMLElement | null = null) {
@@ -515,7 +519,10 @@ export class ButtonControl implements IControl {
 		}
 		
 		const button = this.generateButton(layer);
-		(root != null ? root : document.getElementById('buttonHolder')!).appendChild(button.nav);
+		const buttonHolder = root !== null ? root : document.getElementById('buttonHolder');
+		if(buttonHolder !== null) {
+			buttonHolder.appendChild(button.nav);
+		}
 		if(layer.active) {
 			button.select();
 		}

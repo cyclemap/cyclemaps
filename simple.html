@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>cyclemaps</title>
+	<link rel="stylesheet" type="text/css" href="dist/cyclemaps.css" />
+	<script type="module" src="dist/cyclemaps.js"></script>
+	
+	<link rel="icon" href="sprite/bikeicon.png">
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		.map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+		}
+		.maplibregl-ctrl-scale, .maplibregl-ctrl-attrib, .legend {
+			pointer-events: none;
+		}
+		.maplibregl-ctrl, .border, .legend {
+			user-select: none;
+		}
+		.border {
+			margin-top: 5em;
+			margin-left: auto;
+			margin-right: auto;
+			width: 30em;
+
+			display: block;
+
+			padding: 50px;
+			padding-top: 25px; padding-bottom: 25px;
+
+			background-color: hsl(47, 26%, 88%);
+			border-radius: 80px;
+			box-shadow: 2px 2px 4px 4px black inset;
+		}
+		.legend {
+			position: absolute;
+			display: inline-block;
+
+			font-size: small;
+			z-index: 2;
+		}
+		.bottomLegend {
+			left: 110px;
+			bottom: 2px;
+		}
+		.rightLegend {
+			right: 10px;
+			bottom: 20px;
+		}
+		.pathLegend {
+			display: inline-block;
+			padding: 1px;
+			background: hsla(0, 0%, 100%, 75%);
+		}
+		.pathLegendColor {
+			display: inline-block;
+			text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		}
+		.legendItem {
+			display: inline-block;
+		}
+		#footLegend {
+			display: inline-block;
+			transition: opacity 2s;
+		}
+		.iconLegend {
+			display: inline-block;
+			bottom: 0px;
+			background: hsla(0, 0%, 100%, 75%);
+		}
+		.icon {
+			display: inline-block;
+			background: url(sprite/sprite@2x.png) no-repeat;
+			width: 34px;
+			height: 28px;
+			vertical-align: middle;
+			transform: scale(.75);
+		}
+		@media (orientation: portrait) {
+			.buttonHolderEven {
+				flex-direction: column;
+			}
+			.buttonHolderOdd {
+				flex-direction: row;
+			}
+		}
+		@media (orientation: landscape) {
+			.buttonHolderEven {
+				flex-direction: row;
+			}
+			.buttonHolderOdd {
+				flex-direction: column;
+			}
+		}
+		.buttonHolder {
+			display: inline-flex;
+			padding-top: .5rem;
+			padding-left: .5rem;
+		}
+		.buttonHolder nav {
+			display: inline-flex;
+		}
+		.buttonHolder button {
+			margin: .3rem !important;
+			padding: 0;
+			width: 5.5rem;
+			height: 1.8rem;
+			font-size: .8rem;
+			font-weight: 700;
+		}
+		.buttonHolder button.active {
+			background-color: #48b;
+			color: #fff;
+		}
+		.rainLegend {
+			display: none;
+			padding: 5px;
+		}
+		.guage {
+			display: inline-block;
+		}
+		#routes {
+			background-color: hsl(0, 20%, 60%);
+		}
+		#routes.active {
+			background-color: hsl(0, 100%, 50%);
+		}
+		#gravel-road {
+			background-color: hsl(0, 0%, 75%);
+		}
+		#gravel-road.active {
+			background-color: hsl(0, 0%, 50%);
+		}
+		#trails {
+			background-color: hsl(25, 20%, 60%);
+		}
+		#trails.active {
+			background-color: hsl(25, 60%, 45%);
+		}
+		#paved {
+			background-color: hsl(120, 8%, 50%);
+		}
+		#paved.active {
+			background-color: hsl(120, 60%, 30%);
+		}
+	</style>
+</head>
+<body>
+	<div id="map" class="map">
+	</div>
+</body>
+</html>
