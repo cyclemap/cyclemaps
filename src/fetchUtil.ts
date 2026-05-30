@@ -2,8 +2,8 @@
 export class FetchUtil {
 	private static CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN = process.env.CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN;
 
-	public static async fetch(url: string): Promise<string> {
-		const response = await fetch(url);
+	public static async fetch(url: string, options = {}): Promise<string> {
+		const response = await fetch(url, options);
 		if (!response.ok) {
 			throw new Error(`http error. status: ${response.status}`);
 		}

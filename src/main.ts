@@ -130,7 +130,7 @@ export class MainControl implements IControl {
 	 * replace this method call with just getStyleQuery() to test the normal behavior
 	 */
 	private static async getStyle(): Promise<string> {
-		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING)).trim();
+		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING, {cache: "no-store"})).trim();
 
 		const data = await FetchUtil.fetchAndParse(this.getStyleQuery());
 		data.sources.openmaptiles.url = data.sources.openmaptiles.url.replaceAll(TILESERVER_REPLACE, listingFilename);
