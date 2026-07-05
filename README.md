@@ -30,7 +30,7 @@
 
 ## non server-side layers
 
-### noaa layer notes
+### weather -> past rain layer (noaa layer)
 
 `curl https://mapservices.weather.noaa.gov/raster/rest/services/obs/rfc_qpe/MapServer/?f=json |jq`
  
