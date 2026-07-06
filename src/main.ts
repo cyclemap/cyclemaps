@@ -16,7 +16,7 @@ const highZoom = 12;
 const cookieAttributes: Cookies.CookieAttributes = { expires: 182 };
 
 // this listing has a filename that we use to find the tile results
-const TILESERVER_LISTING = 'https://tileserver.cyclemaps.org/cyclemaps.listing';
+const TILESERVER_LISTING = `https://tileserver.cyclemaps.org/cyclemaps.listing?time=${Date.now()}`;
 // this text gets replaced with the cyclemaps listing result in the openmaptiles style, the rest is used as-is (the protocol and the server)
 const TILESERVER_REPLACE = 'cyclemaps.pmtiles';
 
@@ -130,7 +130,7 @@ export class MainControl implements IControl {
 	 * replace this method call with just getStyleQuery() to test the normal behavior
 	 */
 	private static async getStyle(): Promise<string> {
-		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING, {cache: "no-store"})).trim();
+		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING)).trim();
 
 		const data = await FetchUtil.fetchAndParse(this.getStyleQuery());
 		data.sources.openmaptiles.url = data.sources.openmaptiles.url.replaceAll(TILESERVER_REPLACE, listingFilename);
