@@ -9,6 +9,14 @@
 			"type": "vector",
 			"url": "pmtiles://https://tileserver.cyclemaps.org/cyclemaps.pmtiles",
 			"attribution": "copyright <a href=\"https://openstreetmap.org/copyright\">openstreetmap</a>"
+		},
+		"terrainSource": {
+			"type": "raster-dem",
+			"url": "https://tiles.mapterhorn.com/tilejson.json"
+		},
+		"hillshadeSource": {
+			"type": "raster-dem",
+			"url": "https://tiles.mapterhorn.com/tilejson.json"
 		}
 	},
 	"sprite": "https://cyclemaps.org/sprite/sprite",
@@ -2660,7 +2668,18 @@
 				"class",
 				"dummy"
 			]
+		},
+		{
+			"id": "hills",
+			"type": "hillshade",
+			"source": "hillshadeSource",
+			"layout": {"visibility": "visible"},
+			"paint": {"hillshade-shadow-color": "#432"}
 		}
 	],
+	"terrain": {
+		"source": "terrainSource",
+		"exaggeration": 4
+	},
 	"id": "maptiler-basic-cycle"
 }

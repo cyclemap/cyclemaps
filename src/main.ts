@@ -8,7 +8,7 @@ import * as browserImport from './browserImport';
 import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
-import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
+import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, TerrainControl, GlobeControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
 const highZoom = 12;
@@ -52,7 +52,7 @@ export class MainControl implements IControl {
 			canvasContextAttributes: {
 				failIfMajorPerformanceCaveat: true,
 			},
-			dragRotate: false,
+			dragRotate: true,
 			attributionControl: false,
 		});
 		this.map.showTileBoundaries = MainControl.query.has('tile');
@@ -60,11 +60,13 @@ export class MainControl implements IControl {
 			customAttribution: 'maplibre', //data attribution comes from the input file
 		}));
 		this.map.addControl(this); //handles some click events
-		this.map.addControl(new NavigationControl());
+		this.map.addControl(new NavigationControl({visualizePitch: true, }));
+		this.map.addControl(new TerrainControl({source: 'terrainSource', exaggeration: 4}));
+		this.map.addControl(new GlobeControl());
 		this.map.addControl(new ScaleControl({}));
 		this.map.addControl(new GeolocateControl({
 			positionOptions: {enableHighAccuracy: true},
-			trackUserLocation: true
+			trackUserLocation: true,
 		}));
 		const buttonControl = new ButtonControl();
 		this.map.addControl(buttonControl);
@@ -115,7 +117,8 @@ export class MainControl implements IControl {
 	private addClickListeners() {
 		this.map.on('mouseup', (event: MapMouseEvent) => {
 			if(event.originalEvent.shiftKey) {
-				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)}`);
+				const elevation = (this.map.queryTerrainElevation(event.lngLat)??0) / 4; // ugh i don't know if maplibre lets you get the elevation data without exaggeration?
+				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)} ${elevation.toFixed(0)}m`);
 			}
 		});
 	}
