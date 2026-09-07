@@ -8,7 +8,8 @@ import * as browserImport from './browserImport';
 import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
-import maplibregl, { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, NavigationControl, ScaleControl, GeolocateControl } from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+import { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, MapLibreEvent, NavigationControl, ScaleControl, GeolocateControl, setWorkerUrl } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
 const highZoom = 12;
@@ -32,6 +33,7 @@ export class MainControl implements IControl {
 
 	public constructor(container: string, style: string) {
 		VectorTextProtocol.addProtocols(maplibregl); //this code includes our osm feature
+		setWorkerUrl(new URL('./maplibre-gl-worker.mjs', import.meta.url).toString());
 		const protocol = new Protocol();
 		addProtocol("pmtiles",protocol.tile);
 		
@@ -70,7 +72,6 @@ export class MainControl implements IControl {
 		this.map.addControl(buttonControl);
 		this.map.addControl(new SaveControl(buttonControl));
 		this.map.scrollZoom.setWheelZoomRate(4 / 450); //default is 1 / 450
-		this.map.on('load', (event: Event) => this.map.resize()); // https://github.com/mapbox/mapbox-gl-js/issues/8982
 	}
 
 	public onAdd(map: Map) {

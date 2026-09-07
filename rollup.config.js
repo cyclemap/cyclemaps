@@ -5,6 +5,7 @@ import terser from '@rollup/plugin-terser';
 import strip from '@rollup/plugin-strip';
 import css from 'rollup-plugin-import-css';
 import dotenv from 'rollup-plugin-dotenv';
+import copy from 'rollup-plugin-copy';
 
 const {BUILD} = process.env;
 const production = BUILD === 'production';
@@ -15,7 +16,14 @@ const nodeResolve = resolve({
 	preferBuiltins: false
 });
 
-const cssOptions = {output: 'cyclemaps.css'};
+const cssResolve = css({output: 'cyclemaps.css'});
+
+const maplibreCopyWorker = copy({
+	targets: [{
+		src: ['node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs', 'node_modules/maplibre-gl/dist/maplibre-gl-shared.mjs'],
+		dest: 'dist',
+	}]
+});
 
 export default {
 	input: ['build/main.js'],
@@ -27,7 +35,7 @@ export default {
 		banner: '/* MIT License Copyright (c) 2024 Contributors */',
 	},
 	plugins: production ?
-		[nodeResolve, css(cssOptions), strip({functions: ['console.log', 'assert.*']}), terser(), commonjs(), dotenv()] :
-		[nodeResolve, css(cssOptions), commonjs(), dotenv()],
+		[maplibreCopyWorker, nodeResolve, cssResolve, strip({functions: ['console.log', 'assert.*']}), terser(), commonjs(), dotenv()] :
+		[maplibreCopyWorker, nodeResolve, cssResolve, commonjs(), dotenv()],
 };
 

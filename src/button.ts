@@ -3,19 +3,32 @@ import { MainControl } from './main';
 import { NavigationControl } from './navigation';
 import { FetchUtil } from './fetchUtil';
 
-import { IControl, Popup, LayerSpecification, SourceSpecification, Map, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
+import { AllLayoutProperties, AllPaintProperties, IControl, Popup, LayerSpecification, SourceSpecification, Map, MapLibreEvent, MapMouseEvent, MapLayerMouseEvent, MapGeoJSONFeature } from 'maplibre-gl';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 
 const DEFAULT_GEOJSON_TYPE = 'symbol';
 
 
 interface Change {
-	propertyType: string;
-	property: string;
+	propertyType: 'layout' | 'paint' | 'zoom';
 	value: any;
 }
 
-type ChangeMap = {[layerId: string]: Change[]};
+interface LayoutChange extends Change {
+	propertyType: 'layout';
+	property: keyof AllLayoutProperties;
+}
+
+interface PaintChange extends Change {
+	propertyType: 'paint';
+	property: keyof AllPaintProperties;
+}
+
+interface ZoomChange extends Change {
+	propertyType: 'zoom';
+}
+
+type ChangeMap = {[layerId: string]: (LayoutChange | PaintChange | ZoomChange)[]};
 
 export interface CyclemapLayerSpecification {
 	id: string;
@@ -336,16 +349,15 @@ class LayerIdsButton extends Button {
 			}
 			this.originalProperties[layerId] = [];
 			changes.forEach(change => {
-				const propertyType = change.propertyType, property = change.property, value = change.value;
-				if(propertyType === 'layout') {
-					this.originalProperties[layerId].push({propertyType, property, value: map.getLayoutProperty(layerId, property)});
+				if(change.propertyType === 'layout') {
+					this.originalProperties[layerId].push({...change, value: map.getLayoutProperty(layerId, change.property)});
 				}
-				else if(propertyType === 'paint') {
-					this.originalProperties[layerId].push({propertyType, property, value: map.getPaintProperty(layerId, property)});
+				else if(change.propertyType === 'paint') {
+					this.originalProperties[layerId].push({...change, value: map.getPaintProperty(layerId, change.property)});
 				}
-				else if(propertyType === 'zoom') {
+				else if(change.propertyType === 'zoom') {
 					const minzoom = layer.minzoom, maxzoom = layer.maxzoom;
-					this.originalProperties[layerId].push({propertyType, property, value: {minzoom, maxzoom}});
+					this.originalProperties[layerId].push({...change, value: {minzoom, maxzoom}});
 				}
 			});
 		});
@@ -363,15 +375,14 @@ class LayerIdsButton extends Button {
 		const map = this.buttonControl.map!;
 		Object.entries(changeMap).forEach(([layerId, changes]) => {
 			changes.forEach(change => {
-				const propertyType = change.propertyType, property = change.property, value = change.value;
-				if(propertyType === 'layout') {
-					map.setLayoutProperty(layerId, property, value);
+				if(change.propertyType === 'layout') {
+					map.setLayoutProperty(layerId, change.property, change.value);
 				}
-				else if(propertyType === 'paint') {
-					map.setPaintProperty(layerId, property, value);
+				else if(change.propertyType === 'paint') {
+					map.setPaintProperty(layerId, change.property, change.value);
 				}
-				else if(propertyType === 'zoom') {
-					map.setLayerZoomRange(layerId, value.minzoom, value.maxzoom);
+				else if(change.propertyType === 'zoom') {
+					map.setLayerZoomRange(layerId, change.value.minzoom, change.value.maxzoom);
 				}
 			});
 		});
@@ -457,10 +468,10 @@ export class ButtonControl implements IControl {
 		}
 		const data: {savePointUrl?: string, buttons: CyclemapLayerSpecification[]} = await FetchUtil.fetchAndParse(buttons);
 		this.savePointUrl = data.savePointUrl;
-		this.map!.on('style.load', (event: Event) => {
+		this.map!.on('style.load', (event: MapLibreEvent) => {
 			this.addLayerButtons(data.buttons);
 		});
-		this.map!.on('load', (event: Event) => {
+		this.map!.on('load', (event: MapLibreEvent) => {
 			this.addLayerButtons(data.buttons);
 			this.setupIcons();
 			this.checkAddGeoJsonLayer();
