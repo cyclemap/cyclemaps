@@ -47,6 +47,8 @@ export interface CyclemapLayerSpecification {
 	source: SourceSpecification | CyclemapLayerSpecification[];
 	beforeId?: string;
 	active?: boolean;
+	minzoom?: number;
+	maxzoom?: number;
 	layout?: any;
 	paint?: any;
 	layerIds?: ChangeMap;
@@ -159,6 +161,8 @@ class LayerButton extends Button {
 			source: id,
 			layout: this.layer.layout ?? {},
 			paint: this.layer.paint ?? {},
+			minzoom: this.layer?.minzoom,
+			maxzoom: this.layer?.maxzoom,
 			...LayerButton.getOptions(this.layer),
 		} as (LayerSpecification & {source?: string | SourceSpecification}), this.layer.beforeId);
 
@@ -193,85 +197,90 @@ class LayerButton extends Button {
 
 	private static getOptions(layer: CyclemapLayerSpecification) {
 		if(layer.type! == 'symbol') {
-			return {'layout': {
-				'icon-image': ["coalesce", ["get", "icon-image"], "marker_11"],
-				'icon-size': ["coalesce", ["get", "icon-size"], 1],
-				'text-field': '{title}',
-				'icon-allow-overlap': true,
-				'text-allow-overlap': true,
-				'text-anchor': 'top',
-				'text-font': ['Noto Sans Regular'],
-				'text-max-width': 9,
-				'icon-offset': [0, -3],
-				'text-offset': [0, .75],
-				'text-padding': 2,
-				'text-size': 12,
-			},
-			'paint': {
-				'text-color': '#666',
-				'text-halo-blur': 0.5,
-				'text-halo-color': 'white',
-				'text-halo-width': 2,
-			}};
+			return {
+				layout: {
+					'icon-image': ['coalesce', ['get', 'icon-image'], 'marker_11'],
+					'icon-size': ['coalesce', ['get', 'icon-size'], 1],
+					'text-field': '{title}',
+					'icon-allow-overlap': true,
+					'text-allow-overlap': true,
+					'text-anchor': 'top',
+					'text-font': ['Noto Sans Regular'],
+					'text-max-width': 9,
+					'icon-offset': [0, -3],
+					'text-offset': [0, .75],
+					'text-padding': 2,
+					'text-size': 12,
+				},
+				paint: {
+					'text-color': '#666',
+					'text-halo-blur': 0.5,
+					'text-halo-color': 'white',
+					'text-halo-width': 2,
+				},
+			};
 		}
 		else if(layer.type! == 'line') {
-			return {'layout': {
-				'line-join': 'round',
-			},
-			'paint': {
-				'line-color': '#00d',
-				'line-width': {
-					'base': 1.2,
-					'stops': [[6, 2], [20, 20]],
+			return {
+				layout: {
+					'line-join': 'round',
 				},
-				'line-opacity': .4,
-			}};
+				paint: {
+					'line-color': '#00d',
+					'line-width': {
+						base: 1.2,
+						stops: [[6, 2], [20, 20]],
+					},
+					'line-opacity': .4,
+				},
+			};
 		}
 		else if(layer.type! == 'fill') {
-			return {'paint': {
-				'fill-color': '#00d',
-				'fill-outline-color': '#00a',
-				'fill-opacity': .12,
-			}};
+			return {
+				paint: {
+					'fill-color': '#00d',
+					'fill-outline-color': '#00a',
+					'fill-opacity': .12,
+				},
+			};
 		}
 		else if(layer.type! == 'heatmap') {
 			return {
-				"maxzoom": 16,
-				"minzoom": 7,
-				"paint": {
-					"heatmap-weight":
-						["*",
-							["coalesce", ["get", "count"], 1],
+				minzoom: 7,
+				maxzoom: 16,
+				paint: {
+					'heatmap-weight':
+						['*',
+							['coalesce', ['get', 'count'], 1],
 							layer.options?.weight ?? 0.00001,
-						]
-					,
-					"heatmap-intensity": {
-						"type": "exponential",
-						"stops": [
+						],
+					'heatmap-intensity': {
+						type: 'exponential',
+						stops: [
 							[8, 0.1],
-							[16, 3000]
-						]
+							[16, 3000],
+						],
 					},
-					"heatmap-radius": {
-						"type": "exponential",
-						"stops": [
+					'heatmap-radius': {
+						type: 'exponential',
+						stops: [
 							[8, 1],
-							[16, 20]
-						]
+							[16, 20],
+						],
 					},
-					"heatmap-color": [
-						"interpolate",
-						["linear"],
-						["heatmap-density"],
-						0, "rgba(0,0,0,0)",
-						0.1, "#103",
-						0.3, "#926",
-						0.4, "#f71",
-						0.5, "#ffa"
+					'heatmap-color': [
+						'interpolate',
+						['linear'],
+						['heatmap-density'],
+						0, 'rgba(0,0,0,0)',
+						0.1, '#103',
+						0.3, '#926',
+						0.4, '#f71',
+						0.5, '#ffa',
 					],
-					"heatmap-opacity": 0.8
-				}
-			}
+					'heatmap-opacity': 0.8,
+				},
+			};
 		}
 		else if(layer.type! == 'raster') {
 			return;
