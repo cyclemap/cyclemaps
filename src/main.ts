@@ -9,7 +9,7 @@ import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import * as maplibregl from 'maplibre-gl';
-import { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, MapLibreEvent, NavigationControl, ScaleControl, GeolocateControl, setWorkerUrl } from 'maplibre-gl';
+import { addProtocol, AttributionControl, IControl, LngLat, Map, MapMouseEvent, MapLibreEvent, NavigationControl, ScaleControl, GeolocateControl, setWorkerUrl, MapLayerMouseEvent, MapGeoJSONFeature, Popup } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
 const highZoom = 12;
@@ -119,7 +119,85 @@ export class MainControl implements IControl {
 				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)}`);
 			}
 		});
+		this.map.on('click', 'mtb_trail_feature', (event: MapLayerMouseEvent) => 
+			new Popup({maxWidth: 'none'})
+				.setLngLat(event.lngLat)
+				.setHTML(MainControl.featureToDescription(event.features![0]))
+				.addTo(this.map));
 	}
+
+	private static featureToDescription(feature: MapGeoJSONFeature) {
+		const subclass = feature.properties.subclass;
+		const location=feature.properties.location;
+		let description = location !== 'yes' ? `The ${subclass} is on the ${location} of the trail` : `This is a ${subclass}`;
+		const heightString=feature.properties.height;
+		const heightActual: number | undefined = heightString !== undefined ? MainControl.parseLength(heightString) : undefined;
+		if(heightActual !== undefined) {
+			const height = heightActual <= 1 ? `${(heightActual*100).toFixed(0)}cm` : `${heightActual.toFixed(1)}m`
+			description += `<br />\nThe height is ${height}`;
+		}
+		const bypass = feature.properties.bypass;
+		if(bypass !== undefined && bypass !== 'no') {
+			description += '<br />\n' + (bypass !== 'yes' ? `There is a bypass on the ${bypass} of the trail` : 'There is a bypass');
+		}
+		return description;
+	}
+
+
+	private static MILE = 1609.344; // exact definition
+	private static YARD = MainControl.MILE/1760;  // exact definition
+	private static FOOT = MainControl.MILE/5280; // exact definition
+	private static INVERSE_FOOT = 1/MainControl.FOOT;
+	private static INCH = MainControl.FOOT/12; // exact definition
+
+	/**
+	 * https://wiki.openstreetmap.org/wiki/Map_features/Units
+	 * m km mi nmi '" yd
+	 */
+	private static parseLength(lengthString: string): number | undefined {
+		lengthString=lengthString.trim();
+		let match = lengthString.match(/^([\d.]+)$/);
+		if(match !== null) {
+			return +match[1];
+		}
+		match = lengthString.match(/^([\d.]+)\s*m$/);
+		if(match !== null) {
+			return +match[1];
+		}
+		match = lengthString.match(/^([\d.]+)\s*km$/);
+		if(match !== null) {
+			return +match[1] * 1000;
+		}
+		match = lengthString.match(/^([\d.]+)\s*mi$/);
+		if(match !== null) {
+			return +match[1] * MainControl.MILE;
+		}
+		match = lengthString.match(/^([\d.]+)\s*nmi$/);
+		if(match !== null) {
+			return +match[1] * 1852;
+		}
+		match = lengthString.match(/^([\d.]+)\s*'\s*([\d.]+)\s*"$/);
+		if(match !== null) {
+			return (+match[1] * 12 + +match[2]) * MainControl.INCH;
+		}
+		match = lengthString.match(/^([\d.]+)\s*yd$/);
+		if(match !== null) {
+			return +match[1] * MainControl.YARD;
+		}
+		console.error(`unexpected length ${lengthString}`);
+		return undefined;
+	}
+
+	/*
+	private static testParseLength() {
+		console.log(MainControl.parseLength('3 m')! - 3);
+		console.log(MainControl.parseLength('0.2 km')! - 200);
+		console.log(MainControl.parseLength('1.45 mi')! - 2333.5488);
+		console.log(MainControl.parseLength('6 nmi')! - 11112);
+		console.log(MainControl.parseLength('12\'5"')! - 3.7846);
+		console.log(MainControl.parseLength('40 yd')! - 36.576);
+	}
+	*/
 
 	/**
 	 * get the content of the style and modify it to have the "listing" filename in it

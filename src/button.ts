@@ -168,8 +168,8 @@ class LayerButton extends Button {
 
 		if(this.layer.type === 'symbol') {
 			const map = this.buttonControl.map!;
-			this.buttonControl.map!.on('click', id, (event: MapMouseEvent) => {
-				const features: MapGeoJSONFeature[] = (event as MapLayerMouseEvent).features!;
+			this.buttonControl.map!.on('click', id, (event: MapLayerMouseEvent) => {
+				const features: MapGeoJSONFeature[] = event.features!;
 				if(features == null || features[0]?.properties?.description == null) {
 					return;
 				}
