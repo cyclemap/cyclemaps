@@ -2548,7 +2548,8 @@
 				],
 				"text-optional": true,
 				"text-padding": 2,
-				"text-size": 12
+				"text-size": 12,
+				"icon-padding": 10
 			},
 			"paint": {
 				"text-color": "hsl(0, 0%, 40%)",

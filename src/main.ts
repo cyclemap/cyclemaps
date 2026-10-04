@@ -50,6 +50,7 @@ export class MainControl implements IControl {
 			style,
 			center: new LngLat(longitude, latitude),
 			zoom: zoom,
+			minZoom: 2,
 			hash: true,
 			canvasContextAttributes: {
 				failIfMajorPerformanceCaveat: true,
@@ -127,7 +128,8 @@ export class MainControl implements IControl {
 	}
 
 	private static featureToDescription(feature: MapGeoJSONFeature) {
-		const subclass = feature.properties.subclass;
+		const subclass = feature.properties.subclass
+			.replaceAll('_', ' ');
 		const location=feature.properties.location;
 		let description = location !== 'yes' ? `The ${subclass} is on the ${location} of the trail` : `This is a ${subclass}`;
 		const heightString=feature.properties.height;
