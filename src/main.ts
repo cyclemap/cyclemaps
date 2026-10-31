@@ -13,19 +13,21 @@ import { addProtocol, AttributionControl, IControl, LngLat, LngLatLike, Map, Map
 import { Point } from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
-const highZoom = 12;
-
-const cookieAttributes: Cookies.CookieAttributes = { expires: 182 };
-
-// this listing has a filename that we use to find the tile results
-const TILESERVER_LISTING = `https://tileserver.cyclemaps.org/cyclemaps.listing?time=${Date.now()}`;
-// this text gets replaced with the cyclemaps listing result in the openmaptiles style, the rest is used as-is (the protocol and the server)
-const TILESERVER_REPLACE = 'cyclemaps.pmtiles';
-
 export class MainControl implements IControl {
 	private map: Map;
 	private dummyContainer: HTMLElement | undefined;
 	private static query = new URLSearchParams(window.location.search);
+
+	private static readonly LAYER_IDS = ['bicycle_parking', 'bicycle_rental', 'drinking_water', 'toilets', 'ford', 'compressed_air', 'bicycle', 'bicycle_repair_station', 'mtb_trail_feature'];
+	private static readonly HIGH_ZOOM = 12;
+
+	private static readonly COOKIE_ATTRIBUTES: Cookies.CookieAttributes = { expires: 182 };
+
+	// this listing has a filename that we use to find the tile results
+	private static readonly TILESERVER_LISTING = `https://tileserver.cyclemaps.org/cyclemaps.listing?time=${Date.now()}`;
+	// this text gets replaced with the cyclemaps listing result in the openmaptiles style, the rest is used as-is (the protocol and the server)
+	private static readonly TILESERVER_REPLACE = 'cyclemaps.pmtiles';
+
 
 	public static async setup(container: string) {
 		const mainControl = new MainControl(container, await MainControl.getStyle());	
@@ -96,7 +98,7 @@ export class MainControl implements IControl {
 	}
 	
 	private checkZoom() {
-		const highZoomEnabled = this.map.getZoom() >= highZoom;
+		const highZoomEnabled = this.map.getZoom() >= MainControl.HIGH_ZOOM;
 		const footLegend = document.getElementById('footLegend');
 		if(footLegend === null) {
 			return;
@@ -110,9 +112,9 @@ export class MainControl implements IControl {
 		}
 		const latitude = this.map.getCenter().lat, longitude = this.map.getCenter().lng, zoom = this.map.getZoom();
 
-		Cookies.set('latitude', latitude.toString(), cookieAttributes);
-		Cookies.set('longitude', longitude.toString(), cookieAttributes);
-		Cookies.set('zoom', zoom.toString(), cookieAttributes);
+		Cookies.set('latitude', latitude.toString(), MainControl.COOKIE_ATTRIBUTES);
+		Cookies.set('longitude', longitude.toString(), MainControl.COOKIE_ATTRIBUTES);
+		Cookies.set('zoom', zoom.toString(), MainControl.COOKIE_ATTRIBUTES);
 	}
 
 	private addMouseListeners() {
@@ -122,7 +124,8 @@ export class MainControl implements IControl {
 				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)}`);
 			}
 		});
-		map.on('click', 'mtb_trail_feature', (event: MapLayerMouseEvent) => 
+		
+		map.on('click', MainControl.LAYER_IDS, (event: MapLayerMouseEvent) => 
 			new Popup({maxWidth: 'none'})
 				.setLngLat(MainControl.eventToPoint(event))
 				.setHTML(MainControl.featureToDescription(event.features![0]))
@@ -136,7 +139,7 @@ export class MainControl implements IControl {
 		}).trackPointer();
 
 		let currentFeaturePoint: LngLatLike | undefined = undefined;
-		map.on('mousemove', 'mtb_trail_feature', (event: MapLayerMouseEvent) => {
+		map.on('mousemove', MainControl.LAYER_IDS, (event: MapLayerMouseEvent) => {
 			console.log(event.features![0].geometry.bbox);
 			const featurePoint = MainControl.eventToPoint(event);
 			if (currentFeaturePoint !== featurePoint) {
@@ -151,7 +154,7 @@ export class MainControl implements IControl {
 			}
 		});
 
-		map.on('mouseleave', 'mtb_trail_feature', () => {
+		map.on('mouseleave', MainControl.LAYER_IDS, () => {
 			currentFeaturePoint = undefined;
 			map.getCanvas().style.cursor = '';
 			tooltip.remove();
@@ -272,10 +275,10 @@ export class MainControl implements IControl {
 	 * replace this method call with just getStyleQuery() to test the normal behavior
 	 */
 	private static async getStyle(): Promise<string> {
-		const listingFilename = (await FetchUtil.fetch(TILESERVER_LISTING)).trim();
+		const listingFilename = (await FetchUtil.fetch(MainControl.TILESERVER_LISTING)).trim();
 
 		const data = await FetchUtil.fetchAndParse(this.getStyleQuery());
-		data.sources.openmaptiles.url = data.sources.openmaptiles.url.replaceAll(TILESERVER_REPLACE, listingFilename);
+		data.sources.openmaptiles.url = data.sources.openmaptiles.url.replaceAll(MainControl.TILESERVER_REPLACE, listingFilename);
 		return data;
 	}
 
@@ -286,7 +289,7 @@ export class MainControl implements IControl {
 
 		
 		if(style != null) {
-			Cookies.set('style', style, cookieAttributes);
+			Cookies.set('style', style, MainControl.COOKIE_ATTRIBUTES);
 		}
 
 		return styleRoot + (style != null && style != 'style-default.json' ? style : 'style.json');
@@ -301,7 +304,7 @@ export class MainControl implements IControl {
 		const buttons = MainControl.query.has('buttons') ? MainControl.query.get('buttons') : cookieButtons;
 		
 		if(buttons != null) {
-			Cookies.set('buttons', buttons, cookieAttributes);
+			Cookies.set('buttons', buttons, MainControl.COOKIE_ATTRIBUTES);
 		}
 
 		return buttons != null ? buttons : 'buttons.json';
