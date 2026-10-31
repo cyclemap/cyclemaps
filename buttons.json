@@ -1,7 +1,7 @@
 {
 	"buttons": [
 		{
-			"id": "expand",
+			"id": "main",
 			"class": "directory",
 			"active": true,
 			"name": "◉",
@@ -29,9 +29,9 @@
 					"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN}"]},
 					"beforeId": "satellite-anchor"
 				},
-				{ "id": "weather", "class": "directory", "source": [
+				{ "id": "past rain", "class": "directory", "source": [
 					{
-						"id": "past-rain-1d",
+						"id": "1-day",
 						"class": "rain",
 						"type": "raster",
 						"paint": {"raster-opacity": 0.5},
@@ -46,7 +46,7 @@
 						}
 					},
 					{
-						"id": "past-rain-3d",
+						"id": "3-days",
 						"class": "rain",
 						"type": "raster",
 						"paint": {"raster-opacity": 0.5},
@@ -61,7 +61,7 @@
 						}
 					},
 					{
-						"id": "past-rain-7d",
+						"id": "7-days",
 						"class": "rain",
 						"type": "raster",
 						"paint": {"raster-opacity": 0.5},
@@ -76,7 +76,7 @@
 						}
 					},
 					{
-						"id": "past-rain-30d",
+						"id": "30-days",
 						"class": "rain",
 						"type": "raster",
 						"paint": {"raster-opacity": 0.5},
