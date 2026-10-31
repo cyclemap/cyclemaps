@@ -140,7 +140,6 @@ export class MainControl implements IControl {
 
 		let currentFeaturePoint: LngLatLike | undefined = undefined;
 		map.on('mousemove', MainControl.LAYER_IDS, (event: MapLayerMouseEvent) => {
-			console.log(event.features![0].geometry.bbox);
 			const featurePoint = MainControl.eventToPoint(event);
 			if (currentFeaturePoint !== featurePoint) {
 				currentFeaturePoint = featurePoint;
@@ -149,7 +148,7 @@ export class MainControl implements IControl {
 
 				tooltip
 					.setLngLat(featurePoint)
-					.setHTML(MainControl.featureToTooltip(event.features![0]))
+					.setHTML(MainControl.featureToTypename(event.features![0]))
 					.addTo(map);
 			}
 		});
@@ -176,35 +175,43 @@ export class MainControl implements IControl {
 		return event.lngLat;
 	}
 
-	private static featureToTooltip(feature: MapGeoJSONFeature) {
-		const featureType = feature.properties.subclass
+	private static featureToTypename(feature: MapGeoJSONFeature) {
+		const type = feature.properties.subclass
 			.replaceAll('_', ' ');
-		return featureType;
+		if(type === 'bicycle') {
+			return 'bicycle shop';
+		}
+		return type;
 	}
 
 	private static featureToDescription(feature: MapGeoJSONFeature) {
-		const featureType = feature.properties.subclass
-			.replaceAll('_', ' ');
+		let type = MainControl.featureToTypename(feature);
+		let name = feature.properties['name:latin'] ?? feature.properties.name;
 		
 		const location=feature.properties.location !== 'yes' ? feature.properties.location : undefined;
 		const bypass = feature.properties.bypass !== undefined && feature.properties.bypass !== 'no' ?
 			feature.properties.bypass : undefined;
 
-		let description = `This is a ${featureType}<br />`;
+		let description = `This is a ${type}<br />\n`;
+		if(name !== undefined) {
+			description += `${name}<br />\n`;
+		}
+		description += `<br />\n`;
+
 		const heightString=feature.properties.height;
 		const heightActual: number | undefined = heightString !== undefined ? MainControl.parseLength(heightString) : undefined;
 		if(heightActual !== undefined) {
 			const height = heightActual <= 1 ? `${(heightActual*100).toFixed(0)}cm` : `${heightActual.toFixed(1)}m`
-			description += `<br />\nThe height is ${height}`;
+			description += `The height is ${height}<br />\n`;
 		}
 		if(location !== undefined || bypass !== undefined) {
-			description += `<br /><br />(`;
+			description += `(`;
 			if(location !== undefined) {description += `It is on the ${location} of the trail`;}
 			if(location !== undefined && bypass !== undefined) {
 				description += '. ';
 			}
 			if(bypass !== undefined) {description += `It can be bypassed`;}
-			description += `)`;
+			description += `)<br />\n`;
 		}
 		return description;
 	}
