@@ -1,7 +1,7 @@
 {
 	"buttons": [
 		{
-			"id": "main",
+			"id": "root",
 			"class": "directory",
 			"active": true,
 			"name": "◉",

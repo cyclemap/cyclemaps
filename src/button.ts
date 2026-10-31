@@ -30,7 +30,7 @@ interface ZoomChange extends Change {
 
 type ChangeMap = {[layerId: string]: (LayoutChange | PaintChange | ZoomChange)[]};
 
-export interface CyclemapLayerSpecification {
+interface ButtonProperties {
 	id: string;
 	name?: string;
 	class?: string;
@@ -44,7 +44,7 @@ export interface CyclemapLayerSpecification {
 	// LayerButton
 	options?: any;
 	type?: string;
-	source: SourceSpecification | CyclemapLayerSpecification[];
+	source: SourceSpecification | ButtonProperties[];
 	beforeId?: string;
 	active?: boolean;
 	minzoom?: number;
@@ -55,18 +55,18 @@ export interface CyclemapLayerSpecification {
 }
 
 class Button {
-	public layer: CyclemapLayerSpecification;
-	protected buttonControl: ButtonControl;
-	public buttonElement: HTMLElement;
-	public nav: HTMLElement;
+	public readonly properties: ButtonProperties;
+	protected readonly buttonControl: ButtonControl;
+	public readonly buttonElement: HTMLElement;
+	public readonly nav: HTMLElement;
 
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		const id = layer.id;
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		const id = properties.id;
 		
-		this.layer = layer;
+		this.properties = properties;
 		this.buttonControl = buttonControl;
 
-		layer.depth = layer.depth ?? 0;
+		properties.depth = properties.depth ?? 0;
 		
 		this.buttonControl.buttons[id] = this;
 		
@@ -78,8 +78,8 @@ class Button {
 		this.buttonElement.setAttribute('id', id);
 		this.buttonElement.setAttribute('class', 'maplibregl-ctrl maplibregl-ctrl-group');
 		
-		const name = layer.name !== undefined ? layer.name : id.replace('-', ' ');
-		this.buttonElement.appendChild(document.createTextNode(name));
+		properties.name = properties.name !== undefined ? properties.name : id.replaceAll('-', ' ');
+		this.buttonElement.appendChild(document.createTextNode(properties.name));
 		this.buttonElement.onclick = (event: Event) => this.toggle();
 	}
 	private toggle() {
@@ -93,7 +93,7 @@ class Button {
 	}
 	public select() {
 		this.deselectDirectory();
-		this.buttonControl.deselectGroup(this.layer.group);
+		this.buttonControl.deselectGroup(this.properties.group);
 		this.buttonElement.classList.add('active');
 	}
 	public deselect() {
@@ -103,29 +103,33 @@ class Button {
 	protected deselectDirectory() {
 		this.buttonControl.deselectDirectories();
 	}
+	private remove() {
+		this.nav.remove();
+		this.buttonElement.remove();
+	}
 }
 
 class DirectoryButton extends Button {
-	private directoryNav: HTMLElement;
+	public readonly directoryNav: HTMLElement;
 
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 		
-		const className = `buttonHolder${layer.depth!%2==0 ? 'Even' : 'Odd'}`;
+		const className = `buttonHolder${properties.depth!%2==0 ? 'Even' : 'Odd'}`;
 		
 		this.directoryNav = document.createElement('nav');
 		this.directoryNav.classList.add(className);
 		this.nav.classList.add(className);
 		this.nav.appendChild(this.directoryNav);
 
-		if(layer.active === undefined || layer.active) {
+		if(properties.active === undefined || properties.active) {
 			this.directoryNav.style.display = 'none';
 		}
 
-		const children = layer.source as CyclemapLayerSpecification[];
-		children.forEach(child => child.depth = layer.depth!+1);
+		const children = properties.source as ButtonProperties[];
+		children.forEach(child => child.depth = properties.depth!+1);
 		
-		this.buttonControl.addLayerButtons(layer.source as CyclemapLayerSpecification[], this.directoryNav as HTMLElement);
+		this.buttonControl.addButtons(children, this.directoryNav as HTMLElement);
 	}
 	public select() {
 		super.select();
@@ -136,37 +140,37 @@ class DirectoryButton extends Button {
 		this.directoryNav.style.display = 'none';
 	}
 	protected deselectDirectory() {
-		this.buttonControl.deselectDirectories(this.layer.depth);
+		this.buttonControl.deselectDirectories(this.properties.depth);
 	}
 }
 
 class LayerButton extends Button {
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 	}
 	public select() {
 		super.select();
-		const id = this.layer.id;
-		if(this.layer.beforeId != null && this.buttonControl.map!.getLayer(this.layer.beforeId) == null) {
-			this.layer.beforeId = undefined;
+		const id = this.properties.id;
+		if(this.properties.beforeId != null && this.buttonControl.map!.getLayer(this.properties.beforeId) == null) {
+			this.properties.beforeId = undefined;
 		}
 		
 		if(this.buttonControl.map!.getSource(id) == null) {
-			this.buttonControl.map!.addSource(id, this.layer.source as SourceSpecification);
+			this.buttonControl.map!.addSource(id, this.properties.source as SourceSpecification);
 		}
 
 		this.buttonControl.map!.addLayer({
 			id,
-			type: this.layer.type,
+			type: this.properties.type,
 			source: id,
-			layout: this.layer.layout ?? {},
-			paint: this.layer.paint ?? {},
-			minzoom: this.layer?.minzoom,
-			maxzoom: this.layer?.maxzoom,
-			...LayerButton.getOptions(this.layer),
-		} as (LayerSpecification & {source?: string | SourceSpecification}), this.layer.beforeId);
+			layout: this.properties.layout ?? {},
+			paint: this.properties.paint ?? {},
+			minzoom: this.properties?.minzoom,
+			maxzoom: this.properties?.maxzoom,
+			...LayerButton.getOptions(this.properties),
+		} as (LayerSpecification & {source?: string | SourceSpecification}), this.properties.beforeId);
 
-		if(this.layer.type === 'symbol') {
+		if(this.properties.type === 'symbol') {
 			const map = this.buttonControl.map!;
 			this.buttonControl.map!.on('click', id, (event: MapLayerMouseEvent) => {
 				const features: MapGeoJSONFeature[] = event.features!;
@@ -188,15 +192,15 @@ class LayerButton extends Button {
 
 	public deselect() {
 		super.deselect();
-		const id = this.layer.id;
+		const id = this.properties.id;
 		if(this.buttonControl.map!.getLayer(id) == null) {
 			return;
 		}
 		this.buttonControl.map!.removeLayer(id);
 	}
 
-	private static getOptions(layer: CyclemapLayerSpecification) {
-		if(layer.type! == 'symbol') {
+	private static getOptions(properties: ButtonProperties) {
+		if(properties.type! == 'symbol') {
 			return {
 				layout: {
 					'icon-image': ['coalesce', ['get', 'icon-image'], 'marker_11'],
@@ -220,7 +224,7 @@ class LayerButton extends Button {
 				},
 			};
 		}
-		else if(layer.type! == 'line') {
+		else if(properties.type! == 'line') {
 			return {
 				layout: {
 					'line-join': 'round',
@@ -235,7 +239,7 @@ class LayerButton extends Button {
 				},
 			};
 		}
-		else if(layer.type! == 'fill') {
+		else if(properties.type! == 'fill') {
 			return {
 				paint: {
 					'fill-color': '#00d',
@@ -244,7 +248,7 @@ class LayerButton extends Button {
 				},
 			};
 		}
-		else if(layer.type! == 'heatmap') {
+		else if(properties.type! == 'heatmap') {
 			return {
 				minzoom: 7,
 				maxzoom: 16,
@@ -252,7 +256,7 @@ class LayerButton extends Button {
 					'heatmap-weight':
 						['*',
 							['coalesce', ['get', 'count'], 1],
-							layer.options?.weight ?? 0.00001,
+							properties.options?.weight ?? 0.00001,
 						],
 					'heatmap-intensity': {
 						type: 'exponential',
@@ -282,16 +286,16 @@ class LayerButton extends Button {
 				},
 			};
 		}
-		else if(layer.type! == 'raster') {
+		else if(properties.type! == 'raster') {
 			return;
 		}
-		console.error('unknown type: ', layer.type!);
+		console.error('unknown type: ', properties.type!);
 	}
 }
 
 class RainButton extends LayerButton {
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 	}
 	public select() {
 		super.select();
@@ -305,8 +309,8 @@ class RainButton extends LayerButton {
 
 class NavigationButton extends Button {
 	private navigationControl: NavigationControl;
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 		this.navigationControl = new NavigationControl();
 	}
 	public select() {
@@ -320,8 +324,8 @@ class NavigationButton extends Button {
 }
 
 class ResetButton extends Button {
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 	}
 	public select() {
 		super.select();
@@ -331,8 +335,8 @@ class ResetButton extends Button {
 }
 
 class AboutButton extends Button {
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 	}
 	public select() {
 		super.select();
@@ -346,14 +350,14 @@ class AboutButton extends Button {
 }
 
 class LayerIdsButton extends Button {
-	private originalProperties: ChangeMap = {};
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	private readonly originalProperties: ChangeMap = {};
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 		const map = this.buttonControl.map!;
-		Object.entries(this.layer.layerIds!).forEach(([layerId, changes]) => {
-			const layer = map.getLayer(layerId);
-			if(layer === undefined) {
-				console.error(`layer ${layerId} is not found in the map`);
+		Object.entries(this.properties.layerIds!).forEach(([layerId, changes]) => {
+			const properties = map.getLayer(layerId);
+			if(properties === undefined) {
+				console.error(`properties ${layerId} is not found in the map`);
 				return;
 			}
 			this.originalProperties[layerId] = [];
@@ -365,7 +369,7 @@ class LayerIdsButton extends Button {
 					this.originalProperties[layerId].push({...change, value: map.getPaintProperty(layerId, change.property)});
 				}
 				else if(change.propertyType === 'zoom') {
-					const minzoom = layer.minzoom, maxzoom = layer.maxzoom;
+					const minzoom = properties.minzoom, maxzoom = properties.maxzoom;
 					this.originalProperties[layerId].push({...change, value: {minzoom, maxzoom}});
 				}
 			});
@@ -373,7 +377,7 @@ class LayerIdsButton extends Button {
 	}
 	public select() {
 		super.select();
-		this.apply(this.layer.layerIds!);
+		this.apply(this.properties.layerIds!);
 	}
 	public deselect() {
 		//switch it all back
@@ -399,18 +403,18 @@ class LayerIdsButton extends Button {
 }
 
 export class ExternalLinkButton extends Button {
-	public constructor(layer: CyclemapLayerSpecification, buttonControl: ButtonControl) {
-		super(layer, buttonControl);
+	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
+		super(properties, buttonControl);
 	}
 	public select() {
 		super.select();
 		super.deselect();
-		const url = this.layer.url;
+		const url = this.properties.url;
 		if(url === undefined) {
 			console.error('url not defined');
 			return;
 		}
-		const target = this.layer.target ?? '_blank';
+		const target = this.properties.target ?? '_blank';
 		window.open(ExternalLinkButton.formatUrl(this.buttonControl.map!, url), target);
 	}
 	public static formatUrl(map: Map, url: string) {
@@ -425,7 +429,7 @@ export class ExternalLinkButton extends Button {
 export class ButtonControl implements IControl {
 	public map: Map | undefined;
 	private container: HTMLElement | undefined;
-	public buttons: {[buttonId: string]: Button} = {};
+	public readonly buttons: {[buttonId: string]: Button} = {};
 	public savePointUrl: string | undefined;
 
 	public onAdd(map: Map) {
@@ -457,7 +461,7 @@ export class ButtonControl implements IControl {
 	}
 	
 	private addLayerHelper(id: string, type: string, options: any, data: FeatureCollection | Feature | string) {
-		this.addLayerButton({
+		this.addButton({
 			id,
 			type,
 			options,
@@ -475,13 +479,13 @@ export class ButtonControl implements IControl {
 		if(buttons === null) {
 			return;
 		}
-		const data: {savePointUrl?: string, buttons: CyclemapLayerSpecification[]} = await FetchUtil.fetchAndParse(buttons);
+		const data: {savePointUrl?: string, buttons: ButtonProperties[]} = await FetchUtil.fetchAndParse(buttons);
 		this.savePointUrl = data.savePointUrl;
 		this.map!.on('style.load', (event: MapLibreEvent) => {
-			this.addLayerButtons(data.buttons);
+			this.addButtons(data.buttons);
 		});
 		this.map!.on('load', (event: MapLibreEvent) => {
-			this.addLayerButtons(data.buttons);
+			this.addButtons(data.buttons);
 			this.setupIcons();
 			this.checkAddGeoJsonLayer();
 		});
@@ -496,82 +500,54 @@ export class ButtonControl implements IControl {
 		}
 	}
 
-	public addLayerButtons(layers: CyclemapLayerSpecification[], root: HTMLElement | null = null) {
-		for(const layer of layers) {
-			this.addLayerButton(layer, root);
+	public addButtons(propertiesList: ButtonProperties[], parent: HTMLElement | null = null) {
+		for(const properties of propertiesList) {
+			this.addButton(properties, parent);
 		}
 	}
 	
-	/*
-	private removeLayerButtons(layers: CyclemapLayerSpecification[]) {
-		for(const layer of layers) {
-			if(layer.id in this.buttons) {
-				this.removeLayerButton(this.buttons[layer.id]);
-			}
-		}
-	}
-	*/
-
-	private generatorMap: {[layerClass: string]: (layer: CyclemapLayerSpecification)=>Button} = {
-		directory: layer => new DirectoryButton(layer, this),
-		rain: layer => new RainButton(layer, this),
-		layer: layer => new LayerButton(layer, this),
-		reset: layer => new ResetButton(layer, this),
-		about: layer => new AboutButton(layer, this),
-		layerIds: layer => new LayerIdsButton(layer, this),
-		externalLink: layer => new ExternalLinkButton(layer, this),
-		navigation: layer => new NavigationButton(layer, this),
+	private generatorMap: {[buttonClass: string]: (properties: ButtonProperties)=>Button} = {
+		directory: properties => new DirectoryButton(properties, this),
+		rain: properties => new RainButton(properties, this),
+		layer: properties => new LayerButton(properties, this),
+		reset: properties => new ResetButton(properties, this),
+		about: properties => new AboutButton(properties, this),
+		layerIds: properties => new LayerIdsButton(properties, this),
+		externalLink: properties => new ExternalLinkButton(properties, this),
+		navigation: properties => new NavigationButton(properties, this),
 	};
 
-	private generateButton(layer: CyclemapLayerSpecification) {
-		if(layer.class === undefined) {
-			layer.class = 'externalLink';
+	private generateButton(properties: ButtonProperties) {
+		if(properties.class === undefined) {
+			properties.class = 'externalLink';
 		}
-		if(!(layer.class in this.generatorMap)) {
-			console.error(`could not find class ${layer.class} in generator map`);
+		if(!(properties.class in this.generatorMap)) {
+			console.error(`could not find class ${properties.class} in generator map`);
 		}
-		return this.generatorMap[layer.class](layer);
+		return this.generatorMap[properties.class](properties);
 	}
 
-	private addLayerButton(layer: CyclemapLayerSpecification, root: HTMLElement | null = null) {
-		if(document.getElementById(layer.id) != null) {
+	private addButton(properties: ButtonProperties, parent: HTMLElement | null = null) {
+		if(document.getElementById(properties.id) != null) {
 			return;
 		}
 		
-		const button = this.generateButton(layer);
-		const buttonHolder = root !== null ? root : document.getElementById('buttonHolder');
+		const button = this.generateButton(properties);
+		const buttonHolder = parent !== null ? parent : document.getElementById('buttonHolder');
 		if(buttonHolder !== null) {
 			buttonHolder.appendChild(button.nav);
 		}
-		if(layer.active) {
+		if(properties.active) {
 			button.select();
 		}
 	}
 
-	private removeLayerButton(button: Button) {
-		button.deselect();
-		const id = button.layer.id;
-		if(this.map!.getSource(id) != null) {
-			this.map!.removeSource(id);
+	public deselectById(id: string) {
+		if(!(id in this.buttons)) {
+			return;
 		}
-		button.buttonElement.remove();
+		this.buttons[id].deselect();
 	}
-
-	/*
-	private removeLayerButtonById(id: string) {
-		const button: Button = this.buttons[id];
-		if(button !== undefined) {
-			this.removeLayerButton(button);
-		}
-	}
-
-	private removeLayerById(id: string) {
-		const button: Button = this.buttons[id];
-		if(button !== undefined) {
-			button.deselect();
-		}
-	}
-	*/
 
 	public deselectAll() {
 		Object.values(this.buttons)
@@ -585,7 +561,7 @@ export class ButtonControl implements IControl {
 		}
 		Object.values(this.buttons)
 			.filter(button =>
-				button.layer.group === group &&
+				button.properties.group === group &&
 				button.buttonElement.classList.contains('active'))
 			.forEach(button => button.deselect())
 	}
@@ -594,8 +570,8 @@ export class ButtonControl implements IControl {
 		Object.values(this.buttons)
 			.filter(button =>
 				button instanceof DirectoryButton &&
-				(depth === undefined || button.layer.depth === depth) &&
-				!button.layer.active && //ignore the ones that started on
+				(depth === undefined || button.properties.depth === depth) &&
+				!button.properties.active && //ignore the ones that started on
 				button.buttonElement.classList.contains('active'))
 			.forEach(button => button.deselect())
 	}
