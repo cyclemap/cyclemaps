@@ -18,7 +18,8 @@ export class MainControl implements IControl {
 	private dummyContainer: HTMLElement | undefined;
 	private static query = new URLSearchParams(window.location.search);
 
-	private static readonly LAYER_IDS = ['bicycle_parking', 'bicycle_rental', 'drinking_water', 'toilets', 'ford', 'compressed_air', 'bicycle', 'bicycle_repair_station', 'mtb_trail_feature'];
+	private static readonly LAYER_IDS = ['bicycle', 'bicycle_parking', 'bicycle_rental', 'bicycle_repair_station', 'compressed_air', 'drinking_water', 'ford', 'mtb_trail_feature', 'toilets'];
+	private static readonly HAVE_IMAGE: {[key: string]: boolean} = {'bicycle-rental': true, 'bicycle-repair-station': true, 'bridge': true, 'drinking-water': true, 'drop': true, 'gap-jump': true, 'jump': true, 'skinny': true, 'teeter': true, 'wall-ride': true};
 	private static readonly HIGH_ZOOM = 12;
 
 	private static readonly COOKIE_ATTRIBUTES: Cookies.CookieAttributes = { expires: 182 };
@@ -183,6 +184,10 @@ export class MainControl implements IControl {
 		}
 		return type;
 	}
+	private static getImageUrl(feature: MapGeoJSONFeature): string | undefined {
+		const name = feature.properties.subclass.replaceAll('_', '-');
+		return MainControl.HAVE_IMAGE[name] ? `/images/${name}-200.jpg` : undefined;
+	}
 
 	private static featureToDescription(feature: MapGeoJSONFeature) {
 		let type = MainControl.featureToTypename(feature);
@@ -195,6 +200,10 @@ export class MainControl implements IControl {
 		let description = `This is a ${type}<br />\n`;
 		if(name !== undefined) {
 			description += `${name}<br />\n`;
+		}
+		const imageUrl = MainControl.getImageUrl(feature);
+		if(imageUrl !== undefined) {
+			description += `<img src="${imageUrl}" /><br />\n`;
 		}
 		description += `<br />\n`;
 
