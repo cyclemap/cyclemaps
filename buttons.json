@@ -29,6 +29,91 @@
 					"source": {"type": "raster", "tiles": ["https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/{z}/{x}/{y}?access_token={CYCLEMAPS_MAPBOX_PUBLIC_ACCESS_TOKEN}"]},
 					"beforeId": "satellite-anchor"
 				},
+				{ "id": "bike-things", "class": "directory", "source": [
+					{ "id": "shops", "class": "layerIds", "group": "poi", "layerIds": {
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "repair", "class": "layerIds", "group": "poi", "layerIds": {
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"compressed_air": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true},
+							{"propertyType": "layout", "property": "text-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "drinking-water", "class": "layerIds", "group": "poi", "layerIds": {
+						"drinking_water": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "mtb", "class": "layerIds", "group": "poi", "layerIds": {
+						"mtb_trail_feature": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "rent", "class": "layerIds", "group": "poi", "layerIds": {
+						"bicycle_rental": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "restroom", "class": "layerIds", "group": "poi", "layerIds": {
+						"toilets": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}},
+					{ "id": "parking", "class": "layerIds", "group": "poi", "layerIds": {
+						"bicycle_parking": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
+						],
+						"bicycle": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						],
+						"bicycle_repair_station": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
+						]
+					}}
+				]},
 				{ "id": "past rain", "class": "directory", "source": [
 					{
 						"id": "1-day",

@@ -34,8 +34,9 @@ interface ButtonProperties {
 	id: string;
 	name?: string;
 	class?: string;
-	group?: string; // deselect others when one part of the group is selected
+	group?: string; // deselect others when one part of the group is selected, also show in parent
 	depth?: number;
+	parent?: DirectoryButton;
 	
 	// ExternalLinkButton
 	url?: string;
@@ -59,6 +60,7 @@ class Button {
 	protected readonly buttonControl: ButtonControl;
 	public readonly buttonElement: HTMLElement;
 	public readonly nav: HTMLElement;
+	public readonly parent: Button | undefined;
 
 	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
 		const id = properties.id;
@@ -78,9 +80,20 @@ class Button {
 		this.buttonElement.setAttribute('id', id);
 		this.buttonElement.setAttribute('class', 'maplibregl-ctrl maplibregl-ctrl-group');
 		
-		properties.name = properties.name !== undefined ? properties.name : id.replaceAll('-', ' ');
-		this.buttonElement.appendChild(document.createTextNode(properties.name));
 		this.buttonElement.onclick = (event: Event) => this.toggle();
+
+		this.setupName();
+	}
+	private setupName() {
+		const properties = this.properties;
+		const id = properties.id;
+		properties.name = properties.name !== undefined ? properties.name : id.replaceAll('-', ' ');
+		if(this.buttonElement.childNodes.length > 0) {
+			this.buttonElement.childNodes[0].textContent = properties.name;
+		}
+		else {
+			this.buttonElement.appendChild(document.createTextNode(properties.name));
+		}
 	}
 	private toggle() {
 		const active = this.buttonElement.classList.contains('active');
@@ -95,10 +108,12 @@ class Button {
 		this.deselectDirectory();
 		this.buttonControl.deselectGroup(this.properties.group);
 		this.buttonElement.classList.add('active');
+		this.checkShowOnParent();
 	}
 	public deselect() {
 		this.buttonElement.classList.remove('active');
 		this.deselectDirectory();
+		this.checkUnshowOnParent();
 	}
 	protected deselectDirectory() {
 		this.buttonControl.deselectDirectories();
@@ -106,6 +121,22 @@ class Button {
 	private remove() {
 		this.nav.remove();
 		this.buttonElement.remove();
+	}
+	private checkShowOnParent() {
+		const parent = this.properties.parent;
+		if(this.properties.group !== undefined && parent !== undefined) {
+			parent.buttonElement.classList.add('child-active');
+			parent.properties.name = this.properties.name;
+			parent.setupName();
+		}
+	}
+	private checkUnshowOnParent() {
+		const parent = this.properties.parent;
+		if(this.properties.group !== undefined && parent !== undefined) {
+			parent.buttonElement.classList.remove('child-active');
+			parent.properties.name = undefined;
+			parent.setupName();
+		}
 	}
 }
 
@@ -126,10 +157,15 @@ class DirectoryButton extends Button {
 			this.directoryNav.style.display = 'none';
 		}
 
-		const children = properties.source as ButtonProperties[];
-		children.forEach(child => child.depth = properties.depth!+1);
+		const children = (properties.source as ButtonProperties[])
+			.map(child => (
+				{...child,
+					parent: this,
+					depth: properties.depth!+1,
+				}
+			));
 		
-		this.buttonControl.addButtons(children, this.directoryNav as HTMLElement);
+		this.buttonControl.addButtons(children);
 	}
 	public select() {
 		super.select();
@@ -500,10 +536,9 @@ export class ButtonControl implements IControl {
 		}
 	}
 
-	public addButtons(propertiesList: ButtonProperties[], parent: HTMLElement | null = null) {
-		for(const properties of propertiesList) {
-			this.addButton(properties, parent);
-		}
+	public addButtons(propertiesList: ButtonProperties[]) {
+		propertiesList
+			.forEach(properties => this.addButton(properties));
 	}
 	
 	private generatorMap: {[buttonClass: string]: (properties: ButtonProperties)=>Button} = {
@@ -527,13 +562,13 @@ export class ButtonControl implements IControl {
 		return this.generatorMap[properties.class](properties);
 	}
 
-	private addButton(properties: ButtonProperties, parent: HTMLElement | null = null) {
+	private addButton(properties: ButtonProperties) {
 		if(document.getElementById(properties.id) != null) {
 			return;
 		}
 		
 		const button = this.generateButton(properties);
-		const buttonHolder = parent !== null ? parent : document.getElementById('buttonHolder');
+		const buttonHolder = properties.parent !== undefined ? properties.parent.directoryNav : document.getElementById('buttonHolder');
 		if(buttonHolder !== null) {
 			buttonHolder.appendChild(button.nav);
 		}

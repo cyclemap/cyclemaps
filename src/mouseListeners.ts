@@ -91,7 +91,8 @@ export class MouseListeners {
 
 				this.tooltip
 					.setLngLat(featurePoint)
-					.setHTML(MouseListeners.featureToTypename(event.features![0]))
+					.setHTML(MouseListeners.featureToTypename(event.features![0])
+						.replaceAll('-', ' '))
 					.addTo(map);
 			}
 		});
