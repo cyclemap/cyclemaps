@@ -13,13 +13,35 @@ import { addProtocol, AttributionControl, IControl, LngLat, LngLatLike, Map, Map
 import { Point } from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
+type ClassDetails = {
+	prefix?: string, // default is "This is a"
+	hasImage?: boolean, // default is false
+};
+
 export class MainControl implements IControl {
 	private map: Map;
 	private dummyContainer: HTMLElement | undefined;
 	private static query = new URLSearchParams(window.location.search);
 
 	private static readonly LAYER_IDS = ['bicycle', 'bicycle_parking', 'bicycle_rental', 'bicycle_repair_station', 'compressed_air', 'drinking_water', 'ford', 'mtb_trail_feature', 'toilets'];
-	private static readonly HAVE_IMAGE: {[key: string]: boolean} = {'bicycle-rental': true, 'bicycle-repair-station': true, 'bridge': true, 'drinking-water': true, 'drop': true, 'gap-jump': true, 'jump': true, 'skinny': true, 'teeter': true, 'wall-ride': true};
+	private static readonly SUBCLASS_DETAILS: {[layerId: string]: ClassDetails} = {
+		'aframe': {prefix: 'This is an'},
+		'bicycle': {},
+		'bicycle-parking': {prefix: 'This is'},
+		'bicycle-rental': {prefix: 'This is', hasImage: true},
+		'bicycle-repair-station': {hasImage: true},
+		'bridge': {hasImage: true},
+		'compressed-air': {},
+		'drinking-water': {prefix: 'This is', hasImage: true},
+		'drop': {hasImage: true},
+		'ford': {},
+		'gap-jump': {hasImage: true},
+		'jump': {hasImage: true},
+		'skinny': {hasImage: true},
+		'teeter': {hasImage: true},
+		'toilets': {prefix: 'These are'},
+		'wall-ride': {hasImage: true},
+	};
 	private static readonly HIGH_ZOOM = 12;
 
 	private static readonly COOKIE_ATTRIBUTES: Cookies.CookieAttributes = { expires: 182 };
@@ -178,30 +200,30 @@ export class MainControl implements IControl {
 
 	private static featureToTypename(feature: MapGeoJSONFeature) {
 		const type = feature.properties.subclass
-			.replaceAll('_', ' ');
+			.replaceAll('_', '-');
 		if(type === 'bicycle') {
-			return 'bicycle shop';
+			return 'bicycle-shop';
 		}
 		return type;
 	}
-	private static getImageUrl(feature: MapGeoJSONFeature): string | undefined {
-		const name = feature.properties.subclass.replaceAll('_', '-');
-		return MainControl.HAVE_IMAGE[name] ? `/images/${name}-200.jpg` : undefined;
+	private static getImageUrl(type: string): string | undefined {
+		return MainControl.SUBCLASS_DETAILS[type]?.hasImage ? `/images/${type}-200.jpg` : undefined;
 	}
 
 	private static featureToDescription(feature: MapGeoJSONFeature) {
-		let type = MainControl.featureToTypename(feature);
-		let name = feature.properties['name:latin'] ?? feature.properties.name;
+		const type = MainControl.featureToTypename(feature);
+		const name = feature.properties['name:latin'] ?? feature.properties.name;
 		
 		const location=feature.properties.location !== 'yes' ? feature.properties.location : undefined;
 		const bypass = feature.properties.bypass !== undefined && feature.properties.bypass !== 'no' ?
 			feature.properties.bypass : undefined;
 
-		let description = `This is a ${type}<br />\n`;
+		const prefix = MainControl.SUBCLASS_DETAILS[type]?.prefix ?? 'This is a';
+		let description = `${prefix} ${type.replaceAll('-', ' ')}<br />\n`;
 		if(name !== undefined) {
 			description += `${name}<br />\n`;
 		}
-		const imageUrl = MainControl.getImageUrl(feature);
+		const imageUrl = MainControl.getImageUrl(type);
 		if(imageUrl !== undefined) {
 			description += `<img src="${imageUrl}" /><br />\n`;
 		}
