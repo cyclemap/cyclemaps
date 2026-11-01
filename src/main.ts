@@ -1,50 +1,25 @@
 
 import { ButtonControl, ExternalLinkButton } from './button';
 import { SaveControl } from './save';
+import { MouseListeners } from './mouseListeners';
 import { FetchUtil } from './fetchUtil';
-import { PointUtil } from './pointUtil';
 import * as browserImport from './browserImport';
 
 import { Protocol } from "pmtiles";
 import Cookies from 'js-cookie';
 import VectorTextProtocol from 'maplibre-gl-vector-text-protocol';
 import * as maplibregl from 'maplibre-gl';
-import { addProtocol, AttributionControl, IControl, LngLat, LngLatLike, Map, MapMouseEvent, MapLibreEvent, NavigationControl, ScaleControl, GeolocateControl, setWorkerUrl, MapLayerMouseEvent, MapGeoJSONFeature, Popup } from 'maplibre-gl';
+import { addProtocol, AttributionControl, IControl, LngLat, Map, NavigationControl, ScaleControl, GeolocateControl, setWorkerUrl } from 'maplibre-gl';
 import { Point } from 'geojson';
 import 'maplibre-gl/dist/maplibre-gl.css'; // see globals.d.ts for where this is included in the output
 
-type ClassDetails = {
-	prefix?: string, // default is "This is a"
-	hasImage?: boolean, // default is false
-};
-
 export class MainControl implements IControl {
-	private map: Map;
+	private readonly map: Map;
+	private readonly mouseListeners: MouseListeners;
 	private dummyContainer: HTMLElement | undefined;
 	private static query = new URLSearchParams(window.location.search);
 
-	private static readonly LAYER_IDS = ['bicycle', 'bicycle_parking', 'bicycle_rental', 'bicycle_repair_station', 'compressed_air', 'drinking_water', 'ford', 'mtb_trail_feature', 'toilets'];
-	private static readonly SUBCLASS_DETAILS: {[layerId: string]: ClassDetails} = {
-		'aframe': {prefix: 'This is an'},
-		'bicycle': {},
-		'bicycle-parking': {prefix: 'This is'},
-		'bicycle-rental': {prefix: 'This is', hasImage: true},
-		'bicycle-repair-station': {hasImage: true},
-		'bridge': {hasImage: true},
-		'compressed-air': {},
-		'drinking-water': {prefix: 'This is', hasImage: true},
-		'drop': {hasImage: true},
-		'ford': {},
-		'gap-jump': {hasImage: true},
-		'jump': {hasImage: true},
-		'skinny': {hasImage: true},
-		'teeter': {hasImage: true},
-		'toilets': {prefix: 'These are'},
-		'wall-ride': {hasImage: true},
-	};
-	private static readonly HIGH_ZOOM = 12;
-
-	private static readonly COOKIE_ATTRIBUTES: Cookies.CookieAttributes = { expires: 182 };
+	public static readonly COOKIE_ATTRIBUTES: Cookies.CookieAttributes = { expires: 182 };
 
 	// this listing has a filename that we use to find the tile results
 	private static readonly TILESERVER_LISTING = `https://tileserver.cyclemaps.org/cyclemaps.listing?time=${Date.now()}`;
@@ -84,6 +59,7 @@ export class MainControl implements IControl {
 			dragRotate: false,
 			attributionControl: false,
 		});
+		this.mouseListeners = new MouseListeners(this.map);
 		this.map.showTileBoundaries = MainControl.query.has('tile');
 		this.map.addControl(new AttributionControl({
 			customAttribution: 'maplibre', //data attribution comes from the input file
@@ -103,8 +79,7 @@ export class MainControl implements IControl {
 
 	public onAdd(map: Map) {
 		this.dummyContainer = document.createElement('div');
-		this.addMoveListener();
-		this.addMouseListeners();
+		this.mouseListeners.add();
 		return this.dummyContainer;
 	}
 	
@@ -112,196 +87,6 @@ export class MainControl implements IControl {
 		this.dummyContainer!.parentNode!.removeChild(this.dummyContainer!);
 	}
 	
-	private addMoveListener() {
-		this.map.on('moveend', () => this.checkMove());
-		this.checkMove();
-		
-		this.map.on('zoom', () => this.checkZoom());
-		this.checkZoom();
-	}
-	
-	private checkZoom() {
-		const highZoomEnabled = this.map.getZoom() >= MainControl.HIGH_ZOOM;
-		const footLegend = document.getElementById('footLegend');
-		if(footLegend === null) {
-			return;
-		}
-		footLegend.style.opacity = (highZoomEnabled ? 1 : 0).toString();
-	}
-	
-	private checkMove() {
-		if(this.map.isMoving()) {
-			return;
-		}
-		const latitude = this.map.getCenter().lat, longitude = this.map.getCenter().lng, zoom = this.map.getZoom();
-
-		Cookies.set('latitude', latitude.toString(), MainControl.COOKIE_ATTRIBUTES);
-		Cookies.set('longitude', longitude.toString(), MainControl.COOKIE_ATTRIBUTES);
-		Cookies.set('zoom', zoom.toString(), MainControl.COOKIE_ATTRIBUTES);
-	}
-
-	private addMouseListeners() {
-		const map = this.map;
-		map.on('mouseup', (event: MapMouseEvent) => {
-			if(event.originalEvent.shiftKey) {
-				alert(`point:  ${PointUtil.pointToString(event.lngLat, 4)}`);
-			}
-		});
-		
-		map.on('click', MainControl.LAYER_IDS, (event: MapLayerMouseEvent) => 
-			new Popup({maxWidth: 'none'})
-				.setLngLat(MainControl.eventToPoint(event))
-				.setHTML(MainControl.featureToDescription(event.features![0]))
-				.addTo(map));
-
-		const tooltip = new maplibregl.Popup({
-			closeButton: false,
-			closeOnClick: false,
-			offset: 15,
-			anchor: 'bottom-left',
-		}).trackPointer();
-
-		let currentFeaturePoint: LngLatLike | undefined = undefined;
-		map.on('mousemove', MainControl.LAYER_IDS, (event: MapLayerMouseEvent) => {
-			const featurePoint = MainControl.eventToPoint(event);
-			if (currentFeaturePoint !== featurePoint) {
-				currentFeaturePoint = featurePoint;
-
-				map.getCanvas().style.cursor = 'pointer';
-
-				tooltip
-					.setLngLat(featurePoint)
-					.setHTML(MainControl.featureToTypename(event.features![0]))
-					.addTo(map);
-			}
-		});
-
-		map.on('mouseleave', MainControl.LAYER_IDS, () => {
-			currentFeaturePoint = undefined;
-			map.getCanvas().style.cursor = '';
-			tooltip.remove();
-		});
-	}
-
-	/**
-	 * if the event has a point feature, it'll use that
-	 * 
-	 * otherwise it uses the event point (which moves with the mouse)
-	 */
-	private static eventToPoint(event: MapLayerMouseEvent): LngLatLike {
-		const feature = event.features![0];
-		if(feature.geometry.type === 'Point') {
-			return feature.geometry.coordinates as [number, number];
-		}
-
-		// use the event point
-		return event.lngLat;
-	}
-
-	private static featureToTypename(feature: MapGeoJSONFeature) {
-		const type = feature.properties.subclass
-			.replaceAll('_', '-');
-		if(type === 'bicycle') {
-			return 'bicycle-shop';
-		}
-		return type;
-	}
-	private static getImageUrl(type: string): string | undefined {
-		return MainControl.SUBCLASS_DETAILS[type]?.hasImage ? `/images/${type}-200.jpg` : undefined;
-	}
-
-	private static featureToDescription(feature: MapGeoJSONFeature) {
-		const type = MainControl.featureToTypename(feature);
-		const name = feature.properties['name:latin'] ?? feature.properties.name;
-		
-		const location=feature.properties.location !== 'yes' ? feature.properties.location : undefined;
-		const bypass = feature.properties.bypass !== undefined && feature.properties.bypass !== 'no' ?
-			feature.properties.bypass : undefined;
-
-		const prefix = MainControl.SUBCLASS_DETAILS[type]?.prefix ?? 'This is a';
-		let description = `${prefix} ${type.replaceAll('-', ' ')}<br />\n`;
-		if(name !== undefined) {
-			description += `${name}<br />\n`;
-		}
-		const imageUrl = MainControl.getImageUrl(type);
-		if(imageUrl !== undefined) {
-			description += `<img src="${imageUrl}" /><br />\n`;
-		}
-		description += `<br />\n`;
-
-		const heightString=feature.properties.height;
-		const heightActual: number | undefined = heightString !== undefined ? MainControl.parseLength(heightString) : undefined;
-		if(heightActual !== undefined) {
-			const height = heightActual <= 1 ? `${(heightActual*100).toFixed(0)}cm` : `${heightActual.toFixed(1)}m`
-			description += `The height is ${height}<br />\n`;
-		}
-		if(location !== undefined || bypass !== undefined) {
-			description += `(`;
-			if(location !== undefined) {description += `It is on the ${location} of the trail`;}
-			if(location !== undefined && bypass !== undefined) {
-				description += '. ';
-			}
-			if(bypass !== undefined) {description += `It can be bypassed`;}
-			description += `)<br />\n`;
-		}
-		return description;
-	}
-
-
-	private static MILE = 1609.344; // exact definition
-	private static YARD = MainControl.MILE/1760;  // exact definition
-	private static FOOT = MainControl.MILE/5280; // exact definition
-	private static INVERSE_FOOT = 1/MainControl.FOOT;
-	private static INCH = MainControl.FOOT/12; // exact definition
-
-	/**
-	 * https://wiki.openstreetmap.org/wiki/Map_features/Units
-	 * m km mi nmi '" yd
-	 */
-	private static parseLength(lengthString: string): number | undefined {
-		lengthString=lengthString.trim();
-		let match = lengthString.match(/^([\d.]+)$/);
-		if(match !== null) {
-			return +match[1];
-		}
-		match = lengthString.match(/^([\d.]+)\s*m$/);
-		if(match !== null) {
-			return +match[1];
-		}
-		match = lengthString.match(/^([\d.]+)\s*km$/);
-		if(match !== null) {
-			return +match[1] * 1000;
-		}
-		match = lengthString.match(/^([\d.]+)\s*mi$/);
-		if(match !== null) {
-			return +match[1] * MainControl.MILE;
-		}
-		match = lengthString.match(/^([\d.]+)\s*nmi$/);
-		if(match !== null) {
-			return +match[1] * 1852;
-		}
-		match = lengthString.match(/^([\d.]+)\s*'\s*([\d.]+)\s*"$/);
-		if(match !== null) {
-			return (+match[1] * 12 + +match[2]) * MainControl.INCH;
-		}
-		match = lengthString.match(/^([\d.]+)\s*yd$/);
-		if(match !== null) {
-			return +match[1] * MainControl.YARD;
-		}
-		console.error(`unexpected length ${lengthString}`);
-		return undefined;
-	}
-
-	/*
-	private static testParseLength() {
-		console.log(MainControl.parseLength('3 m')! - 3);
-		console.log(MainControl.parseLength('0.2 km')! - 200);
-		console.log(MainControl.parseLength('1.45 mi')! - 2333.5488);
-		console.log(MainControl.parseLength('6 nmi')! - 11112);
-		console.log(MainControl.parseLength('12\'5"')! - 3.7846);
-		console.log(MainControl.parseLength('40 yd')! - 36.576);
-	}
-	*/
 
 	/**
 	 * get the content of the style and modify it to have the "listing" filename in it
