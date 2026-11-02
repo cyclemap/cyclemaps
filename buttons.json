@@ -6,21 +6,26 @@
 			"active": true,
 			"name": "◉",
 			"source": [
-				{ "id": "routes", "class": "layerIds", "active": false, "layerIds": {
-					"cycle-route": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
-				}},
-				{ "id": "gravel-road", "class": "layerIds", "active": false, "layerIds": {
-					"road-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
-				}},
-				{ "id": "trails", "class": "layerIds", "active": true, "layerIds": {
-					"cycleway-unpaved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
-					"cycleway-unknown": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
-				}},
-				{ "id": "paved", "class": "layerIds", "active": true, "layerIds": {
-					"cycleway-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}],
-					"cyclefriendly-paved": [{"propertyType": "layout", "property": "visibility", "value": "visible"}]
-				}},
-				{ "id": "navigation", "class": "navigation" },
+				{ "id": "routes", "class": "layerIds", "active": false, "changes": [
+					{"layerIds": ["cycle-route"], "changes": [
+						{"propertyType": "layout", "property": "visibility", "value": "visible"}
+					]}
+				]},
+				{ "id": "gravel-road", "class": "layerIds", "active": false, "changes": [
+					{"layerIds": ["road-unpaved"], "changes": [
+						{"propertyType": "layout", "property": "visibility", "value": "visible"}
+					]}
+				]},
+				{ "id": "trails", "class": "layerIds", "active": true, "changes": [
+					{"layerIds": ["cycleway-unpaved", "cycleway-unknown"], "changes": [
+						{"propertyType": "layout", "property": "visibility", "value": "visible"}
+					]}
+				]},
+				{ "id": "paved", "class": "layerIds", "active": true, "changes": [
+					{"layerIds": ["cycleway-paved", "cyclefriendly-paved"], "changes": [
+						{"propertyType": "layout", "property": "visibility", "value": "visible"}
+					]}
+				]},
 				{
 					"id": "satellite",
 					"class": "layer",
@@ -30,91 +35,73 @@
 					"beforeId": "satellite-anchor"
 				},
 				{ "id": "bike-things", "class": "directory", "source": [
-					{ "id": "shops", "class": "layerIds", "group": "poi", "layerIds": {
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
-							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "repair", "class": "layerIds", "group": "poi", "layerIds": {
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
-							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"compressed_air": [
+					{ "id": "shops", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["bicycle"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true},
 							{"propertyType": "layout", "property": "text-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "drinking-water", "class": "layerIds", "group": "poi", "layerIds": {
-						"drinking_water": [
+						]},
+						{"layerIds": ["bicycle_repair_station", "compressed_air", "drinking_water", "mtb_trail_feature", "bicycle_rental", "toilets", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "repair", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["bicycle_repair_station", "compressed_air"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
+							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true},
+							{"propertyType": "layout", "property": "text-allow-overlap", "value": true}
+						]},
+						{"layerIds": ["bicycle", "drinking_water", "mtb_trail_feature", "bicycle_rental", "toilets", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "drinking-water", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["drinking_water"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "mtb", "class": "layerIds", "group": "poi", "layerIds": {
-						"mtb_trail_feature": [
+						]},
+						{"layerIds": ["bicycle", "bicycle_repair_station", "compressed_air", "mtb_trail_feature", "bicycle_rental", "toilets", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "mtb", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["mtb_trail_feature"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "rent", "class": "layerIds", "group": "poi", "layerIds": {
-						"bicycle_rental": [
+						]},
+						{"layerIds": ["bicycle", "bicycle_repair_station", "compressed_air", "drinking_water", "bicycle_rental", "toilets", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "rent", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["bicycle_rental"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "restroom", "class": "layerIds", "group": "poi", "layerIds": {
-						"toilets": [
+						]},
+						{"layerIds": ["bicycle", "bicycle_repair_station", "compressed_air", "drinking_water", "mtb_trail_feature", "toilets", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "restroom", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["toilets"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}},
-					{ "id": "parking", "class": "layerIds", "group": "poi", "layerIds": {
-						"bicycle_parking": [
+						]},
+						{"layerIds": ["bicycle", "bicycle_repair_station", "compressed_air", "drinking_water", "mtb_trail_feature", "bicycle_rental", "bicycle_parking"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]},
+					{ "id": "parking", "class": "layerIds", "group": "poi", "changes": [
+						{"layerIds": ["bicycle_parking"], "changes": [
 							{"propertyType": "zoom", "property": "", "value": {"minzoom": 8, "maxzoom": 22}},
 							{"propertyType": "layout", "property": "icon-allow-overlap", "value": true}
-						],
-						"bicycle": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						],
-						"bicycle_repair_station": [
-							{"propertyType": "zoom", "property": "", "value": {"minzoom": 14, "maxzoom": 22}}
-						]
-					}}
+						]},
+						{"layerIds": ["bicycle", "bicycle_repair_station", "compressed_air", "drinking_water", "mtb_trail_feature", "bicycle_rental", "toilets"], "changes": [
+							{"propertyType": "zoom", "property": "", "value": {"minzoom": 16, "maxzoom": 22}}
+						]}
+					]}
 				]},
-				{ "id": "past rain", "class": "directory", "source": [
+				{ "id": "past-rain", "class": "directory", "source": [
 					{
 						"id": "1-day",
 						"class": "rain",

@@ -28,7 +28,9 @@ interface ZoomChange extends Change {
 	propertyType: 'zoom';
 }
 
-type ChangeMap = {[layerId: string]: (LayoutChange | PaintChange | ZoomChange)[]};
+type Changes = (LayoutChange | PaintChange | ZoomChange)[];
+type ChangeMap = {[layerId: string]: Changes};
+type ChangeList = {layerIds: string[], changes: Changes}[];
 
 interface ButtonProperties {
 	id: string;
@@ -52,7 +54,7 @@ interface ButtonProperties {
 	maxzoom?: number;
 	layout?: any;
 	paint?: any;
-	layerIds?: ChangeMap;
+	changes?: ChangeList;
 }
 
 class Button {
@@ -390,50 +392,53 @@ class LayerIdsButton extends Button {
 	public constructor(properties: ButtonProperties, buttonControl: ButtonControl) {
 		super(properties, buttonControl);
 		const map = this.buttonControl.map!;
-		Object.entries(this.properties.layerIds!).forEach(([layerId, changes]) => {
-			const properties = map.getLayer(layerId);
-			if(properties === undefined) {
-				console.error(`properties ${layerId} is not found in the map`);
-				return;
-			}
-			this.originalProperties[layerId] = [];
-			changes.forEach(change => {
-				if(change.propertyType === 'layout') {
-					this.originalProperties[layerId].push({...change, value: map.getLayoutProperty(layerId, change.property)});
+		this.properties.changes!.forEach(({layerIds, changes}) =>
+			layerIds.forEach(layerId => {
+				const properties = map.getLayer(layerId);
+				if(properties === undefined) {
+					console.error(`properties ${layerId} is not found in the map`);
+					return;
 				}
-				else if(change.propertyType === 'paint') {
-					this.originalProperties[layerId].push({...change, value: map.getPaintProperty(layerId, change.property)});
-				}
-				else if(change.propertyType === 'zoom') {
-					const minzoom = properties.minzoom, maxzoom = properties.maxzoom;
-					this.originalProperties[layerId].push({...change, value: {minzoom, maxzoom}});
-				}
-			});
-		});
+				this.originalProperties[layerId] = [];
+				changes.forEach(change => {
+					if(change.propertyType === 'layout') {
+						this.originalProperties[layerId].push({...change, value: map.getLayoutProperty(layerId, change.property)});
+					}
+					else if(change.propertyType === 'paint') {
+						this.originalProperties[layerId].push({...change, value: map.getPaintProperty(layerId, change.property)});
+					}
+					else if(change.propertyType === 'zoom') {
+						const minzoom = properties.minzoom, maxzoom = properties.maxzoom;
+						this.originalProperties[layerId].push({...change, value: {minzoom, maxzoom}});
+					}
+				});
+			})
+		);
 	}
 	public select() {
 		super.select();
-		this.apply(this.properties.layerIds!);
+		this.properties.changes!.forEach(({layerIds, changes}) =>
+			layerIds.forEach(layerId =>
+				this.apply(layerId, changes)));
 	}
 	public deselect() {
 		//switch it all back
-		this.apply(this.originalProperties);
+		Object.entries(this.originalProperties).forEach(([layerId, changes]) => 
+			this.apply(layerId, changes));
 		super.deselect();
 	}
-	private apply(changeMap: ChangeMap) {
+	private apply(layerId: string, changes: Changes) {
 		const map = this.buttonControl.map!;
-		Object.entries(changeMap).forEach(([layerId, changes]) => {
-			changes.forEach(change => {
-				if(change.propertyType === 'layout') {
-					map.setLayoutProperty(layerId, change.property, change.value);
-				}
-				else if(change.propertyType === 'paint') {
-					map.setPaintProperty(layerId, change.property, change.value);
-				}
-				else if(change.propertyType === 'zoom') {
-					map.setLayerZoomRange(layerId, change.value.minzoom, change.value.maxzoom);
-				}
-			});
+		changes.forEach(change => {
+			if(change.propertyType === 'layout') {
+				map.setLayoutProperty(layerId, change.property, change.value);
+			}
+			else if(change.propertyType === 'paint') {
+				map.setPaintProperty(layerId, change.property, change.value);
+			}
+			else if(change.propertyType === 'zoom') {
+				map.setLayerZoomRange(layerId, change.value.minzoom, change.value.maxzoom);
+			}
 		});
 	}
 }
